@@ -1,0 +1,13 @@
+#!/bin/bash
+echo "Begin update "
+mysql -uroot -h123.56.236.98 -phccrm2016 <<EOF
+use XXDB;
+update TBL set pwdErrCount='0' where pwdErrCount>'0';
+EOF
+echo "End update"
+
+
+
+
+
+*/60 * * * * /root/update_isRefresh/task_update_isrefresh.sh

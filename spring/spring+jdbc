@@ -1,0 +1,120 @@
+Connection-->Statement----发送sql--->ResultSet
+
+spring+jdbc
+
+1、获取DataSource
+
+	DataSource的配置放在spring的配置文件里配置
+	
+	
+spring的声明式事务管理   是基于AOP实现的
+
+
+
+声明式：针对程序员来的
+
+	需要程序员告诉spring容器哪些方法需要用声明式事务管理，仅仅告诉就行了
+	
+	
+	程序员所做的工作：操作数据库
+	
+	
+	
+	启动事务、事务提交、回滚事务等一些列事务操作交给spring处理
+	
+	
+spring的声明式事务处理的分析：
+
+1、基于AOP的技术实现的
+
+2、通知+目标类+切入点   切面不存在了
+
+3、代理对象的方法体的构成：通知+目标方法
+
+	通知：事务   spring容器实现的
+	
+	
+从细节上分析：
+
+	1、从java类
+	
+		dao层
+		
+			类和接口
+			
+		service层
+		
+			类和接口
+			
+	2、从配置文件：
+	
+		1、把dao层的类和service层的类纳入到spring容器中管理
+		
+		
+		2、配置DataSource
+		
+		3、声明通知   在spring内部要管理事务    引入了事务管理器------》让spring容器管理事务
+		
+			<tx:advice id="txAdvisor" transaction-manager="dataSourceTransactionManager">
+				<tx:attributes>
+				<!-- 
+					name  限定方法的名称   save*  代表以save开头的方法
+					
+					isolation		在大多数情况下，用默认的机制就可以了
+					
+					propagation  事务的传播机制	
+					
+						在一个方法体中，调用了另外一个方法，而这个方法也有事务，这个时候，应该控制事务的属性	
+						
+					read-only  只读
+					
+							true  则数据不能改变
+							
+							false  则数据能修改
+					
+				 -->
+				 
+				 <!-- 
+				 	tx:method是为了更加细粒度（更精确）的控制事务的执行
+				  -->
+					<tx:method name="save*" isolation="DEFAULT" propagation="REQUIRED" read-only="false"/>
+					
+					<tx:method name="delete*" isolation="DEFAULT" propagation="REQUIRED" read-only="false"/>
+					
+					<tx:method @Transactionalname="query*" isolation="DEFAULT" propagation="REQUIRED" read-only="true"/>
+				</tx:attributes>@Transactional
+			</tx:advice>
+			
+		4、配置<aop:config>
+		
+			<aop:config>
+				<aop:pointcut id="perform" expression="execution(* cn.itcast526.spring.jdbctransaction.PersonServiceImpl.*(..))"/>
+				<!-- 
+					advice-ref  指向一个通知
+				 -->
+				<aop:advisor id="advisor" advice-ref="txAdvisor" pointcut-ref="perform"/>
+			</aop:config>
+			
+applicationContext.xml文件：
+
+	自己定义的类+spring的类（固定不变的）
+	
+	
+	
+基于xml的声明式事务处理和基于注解的声明式事务处理的优点和缺点：
+
+	xml:
+	
+		效率比较快
+		
+		
+		针对事务的方法可以进行更加细粒度的控制
+		
+	annotation:
+	
+		效率比较低
+		
+		做到了针对每一个方法进行更细粒度的控制
+		
+		
+			

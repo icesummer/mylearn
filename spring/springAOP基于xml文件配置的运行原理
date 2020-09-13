@@ -1,0 +1,27 @@
+在spring配置文件中，spring容器只要搜索到<aop:config>这个配置，就会启动自动产生代理对象的机制
+
+	会去解析切入点表达式，如果纳入spring管理的类有一个符合这个切入点表达式，spring会为这个类自动产生代理对象,而在客户端用这个类的ID取得的是这个类的代理对象
+	
+如果没有<aop:config>配置，则直接返回目标对象
+	
+	
+<aop:config>
+	<aop:aspect ref="transaction">
+		<aop:pointcut id="perform" expression="execution(* cn.itcast526.spring.aopxml.PersonDaoImpl.*(..))"/>
+		<aop:before method="beginTransaction" pointcut-ref="perform"/>
+	</aop:aspect>
+</aop:config>
+
+
+产生的代理的方法等于  通知+目标类得目标方法
+
+在这个例子中相当于  transaction.beginTransaction+personDaoImpl.deletePerson===personDaoProxy.deletePerson
+
+
+目的：把开启事务的方法与目标类的目标方法完全解耦合
+
+
+
+springAOP的运行原理也是基于或者是jdkproxy或者是cglib的proxy
+
+如果目标类实现了一个接口，那么使用的就是jdkproxy，如果没有实现接口，则使用cglibProxy

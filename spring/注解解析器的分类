@@ -1,0 +1,51 @@
+1、依赖注入的注解解析器
+
+	注解解析器：
+	
+		<context:annotation-config></context:annotation-config>
+		
+		
+	注解有：
+	
+		@Autowired
+		@Qualifier
+		
+		
+		@Resource
+		
+		@PostConstruct
+		
+		@PreDestroy
+
+
+2、类扫描的注解解析器
+
+	注解解析器
+	
+		<context:component-scan base-package="cn.itcast526.spring.scan"></context:component-scan>
+		
+		
+	注解有：
+	
+		@Compontent
+		
+		@Repostory
+		
+		@Service
+		
+		@Controller
+
+
+3、基于AOP的注解解析器
+
+	注解解析器：
+	
+		 <aop:aspectj-autoproxy></aop:aspectj-autoproxy>
+		 
+	注解有：
+	
+	@Aspect
+	
+	@Pointcut
+	
+	@before  基于通知的注解

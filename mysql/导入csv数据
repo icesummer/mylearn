@@ -1,0 +1,10 @@
+使用 into table导入数据的时候出现错误：
+使用 into outfile导出数据的时候出现错误：
+mysql> LOAD data infile '/opt/data/back/emsc/aa.csv' into table emscdb.history;
+ERROR 1290 (HY000): The MySQL server is running with the --secure-file-priv option so it cannot execute this statement
+错误原因：
+上网查了一下，应该是mysql设置的权限，可以使用
+show variables like '%secure%';查看 secure-file-priv 当前的值是‘/var/lib/mysql-files/’
+导入或导出的数据必须是这个值的指定路径才可以，默认有可能是NULL就代表禁止导出，所以需要设置一下（在my.cnf中）
+mysql> LOAD data infile '/var/lib/mysql-files/aa.csv' into table emscdb.history;
+Query OK, 1590997 rows affected (2 min 3.12 sec)

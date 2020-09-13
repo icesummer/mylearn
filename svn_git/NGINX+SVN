@@ -1,0 +1,49 @@
+CentOS下搭建NGINX+SVN
+因为没有什么可以定制的， 所以svn直接使用系统自带的包管理软件安装， 
+以centos系列为例， 命令如下：
+yum install subversion
+然后是nginx的安装：
+mkdir -p /opt/soft 
+groupadd web 
+useradd http -g web -s /sbin/nologin 
+cd /opt/soft 
+wget http://sourceforge.net/projects/pcre/files/pcre/8.12/pcre-8.12.tar.gz 
+wget http://www.openssl.org/source/openssl-1.0.0d.tar.gz 
+tar zxvf pcre-8.12.tar.gz 
+tar zxvf openssl-1.0.0d.tar.gz 
+tar zxvf nginx-0.8.54.tar.gz 
+cd nginx-0.8.54 
+./configure --prefix=/opt/nginx --user=http --group=web --with-http_stub_status_module --with-http_ssl_module --with-md5=/usr/lib/ --with-pcre=/opt/soft/pcre-8.12 --with-openssl=/opt/soft/openssl-1.0.0d 
+make 
+make install 
+ 
+root 指定到/data/wwwroot vi /opt/nginx/conf/nginx.conf 
+...
+创建svn仓库：svnadmin create /data/svn
+修改配置文件： vi /data/svn/conf/authz 
+[groups] 
+admin=test #admin组里的成员 
+[/] 
+test = rw #成员对/目录的权限： r读，w写 
+vi /data/svn/conf/passwd 
+[users] 
+test = 123456 #用户test的密码 
+vi /data/svn/conf/svnserve.conf 
+anon-access = none 
+auth-access = write 
+password-db = passwd 
+authz-db = authz 
+realm = My First Repository
+启动svnserv  svnserve -d -r /data/svn 
+也可以使用--listen-port参数指定端口，启动多个仓库
+导入项目，假如项目目录为svn://host/test ,创建svn仓库副本(nginx的读取目录)
+cd /data/wwwroot 
+svn co svn://localhost/test --username test --password 123456
+设置svn更新后自动更新nginx的读取目录:
+vi /data/svn/hooks/post-commit 
+#!/bin/sh 
+svn up /opt/www/test/ --username "lyf" --password "123456" 
+chown -R http:web /opt/www #这一步或许可以滤过
+给脚本增加可执行权限
+chmod +x /data/svn/hooks/post-commit
+大功告成, 现在可以测试一下了，svn更新后nginx读取到的内容(访问http)也随之变化, 是不是比apache还有简单

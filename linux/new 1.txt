@@ -1,0 +1,72 @@
+切换成功率
+掉话率
+BAND4+BAND5干扰占比
+语音拥塞率
+无线接入性
+无线信道可用率
+lac
+E-RAB
+
+
+
+2018年5月7日被褥      2人180	（加泽星，付聪；）
+2018年5月12日晚餐      7人138
+杨俊，邢荣俊，杨燕丽，姚鹏，夏晓冰，加泽星，陈应兵；
+2018年5月14日晚餐      4人41
+杨俊，邢荣俊，夏晓冰，姚鹏；
+2018年5月15日晚餐      9人106
+胡振贤，杨俊，邢荣俊，杨燕丽，姚鹏，夏晓冰，李娜，陈应兵，杨淋；
+2018年5月16日晚餐      6人97.2
+杨俊，邢荣俊，杨燕丽，夏晓冰，加泽星，陈应兵；
+2018年5月17日晚餐+夜宵      7人238
+杨俊，邢荣俊，杨燕丽，姚鹏，夏晓冰，李娜，陈应兵；
+
+
+	
+
+道路测试：
+	
+	未完成功能：相邻小区，回放，统计，展示类型(HomeEvents)选项；
+室分测试：
+		定点测试：未完功能：小区楼宇搜索，删除测试记录，添加楼宇，添加楼层，室分图纸位置打点；
+		室分扫楼：未完功能：为静态界面功能；
+基站信号：
+
+		
+图纸库选项放到最下面
+路测录像
+路测显示工参，站号不正确
+sinr+rsrp平均值
+
+"C:\Program Files\MySQL\MySQL Server 5.5\bin\mysqld" --defaults-file="C:\Program Files\MySQL\MySQL Server 5.5\my.ini" MySQL
+INSERT INTO `ihandle_merge`.`us_users` (
+user_id,user_login,user_name,user_password,user_status,user_login2,user_mail,user_mail1,user_phone,project_id,user_super,
+user_expire,session_id) 
+SELECT
+user_id,user_login,user_name,user_password,user_status,user_login2,user_mail,user_mail1,user_phone,project_id,user_super,
+DATE_ADD(NOW(),INTERVAL 1 MONTH),session_id
+FROM `ihandle_yn`.`us_users` WHERE user_id=1;
+
+
+章总，我五月份工资按满勤少发965.52，因为一直加班，但是满勤都没有发满；
+机票报销2080.0到现在没有批，
+加班餐饮+床铺报销：1648.90 美团订单
+加班打车报销：110(有发票的)
+云南办公室水电费：51.19+61.92=113.11
+共4804.42
+加上上个月缺的4827.59
+一共是9745.12元；
+
+因为有房贷，家里最近也在打官司，后续的垫付也付不出了，看能不能先把以上补下；
+
+
+jdk：jdk1.8.0_162
+tomcat：apache-tomcat-8.5.28
+测试服务器部署内容：
+两个项目：
+ynNpo和iHandle
+一个redis服务：47.94.18.182:6379	
+
+
+
+

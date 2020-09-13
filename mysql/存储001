@@ -1,0 +1,25 @@
+Delimiter $$
+create procedure testcursor()
+Begin
+Declare stopflag int default  0;
+Declare my_uname varchar(20);
+Declare uname_cur cursor for select uname from users where uid%2=0 ; 
+#1.游标是保存查询结果的临时内存区域，
+#2.游标变量uname_cur保存了查询的临时结果，实际上就是查询结果集
+declare continue handler for not found set stopflag=1;
+#3.当游标变量中保存的结果都查询一遍（遍历），到达结尾，把变量stopflag设置为1
+#用于循环中判断是否结束
+
+Open uname_cur; #打开游标
+Fetch uname_cur into my_uname; #游标向前走一步，取出一条记录放到变量my_uname中。
+  
+  while( stopflag=0 ) do  #如果游标还没有到结尾，就继续
+  begin
+     update testa set uname=concat(my_uname,’_cur’) where uname=my_uname;
+     Fetch uname_cur into my_uname;
+  end ;
+End while;
+Close uname_cur;
+End;
+$$
+Delimiter ;

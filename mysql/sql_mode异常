@@ -1,0 +1,40 @@
+异常：
+MySQL Error caused by sql_mode=only_full_group_by
+this is incompatible with sql_mode=only_full_group_by
+:::http://blog.csdn.net/wyzxg/article/details/8787878
+MySQL的sql_mode合理设置
+sql_mode是个很容易被忽视的变量，默认值是空值，在这种设置下是可以允许一些非法操作的，比如允许一些非法数据的插入。
+在生产环境必须将这个值设置为严格模式，所以开发、测试环境的数据库也必须要设置，这样在开发测试阶段就可以发现问题 
+
+ONLY_FULL_GROUP_BY：
+对于GROUP BY聚合操作，如果在SELECT中的列，没有在GROUP BY中出现，那么这个SQL是不合法的，因为列不在GROUP BY从句中
+
+emsc:中的错误：
+SELECT 
+  t.clear_code,
+  COUNT(t.clear_code) AS cc_count,
+  COUNT(t.clear_code) / temp.total AS kpi 
+FROM
+  history t JOIN 
+  (SELECT 
+    COUNT(1) AS total 
+  FROM
+    history 
+  WHERE (
+      clear_code != '0000H' 
+      AND (report_time >= '2017-01-12 17:43:06') 
+      AND (report_time < '2017-05-12 17:43:06')
+    )) AS temp ON 1=1
+WHERE (
+    clear_code != '0000H' 
+    AND (report_time >= '2017-01-12 17:43:06') 
+    AND (report_time < '2017-05-12 17:43:06')
+  ) 
+GROUP BY t.clear_code 
+ORDER BY cc_count DESC ;
+
+解决：在my.cnf的
+Change sql_mode in my.cnf using your favorite editor and set it to this ：
+sql_mode=STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION
+
+3c94c1ed16ef3feba5b2a0974a2d243f

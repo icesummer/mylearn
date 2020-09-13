@@ -1,0 +1,28 @@
+server {
+        listen       443 ssl;
+        server_name  m.yiwei-fs.com;
+        ssl on;
+
+        ssl_certificate     /data/nginx/m.yiwei-fs.com-ca-bundle.crt;
+        ssl_certificate_key  /data/nginx/m.yiwei-fs.com.key;
+        #ssl_certificate      cert.pem;
+        #ssl_certificate_key  cert.key;
+
+        ssl_session_cache    shared:SSL:10m;
+        ssl_session_timeout  10m;
+
+        ssl_ciphers  ES128-SHA:AES256-SHA:RC4-SHA:DES-CBC3-SHA:RC4-MD5;
+        ssl_prefer_server_ciphers  on;
+
+        location / {
+            proxy_pass http://yiwei-server;
+            proxy_set_header  X-Real-IP  $remote_addr;
+            proxy_set_header  X-Forwarded-For  $proxy_add_x_forwarded_for;
+            proxy_set_header  Host  $http_host;
+            charset utf-8;          #显示中文
+            add_header 'Access-Control-Allow-Origin' '*'; #允许来自所有的访问地址
+            add_header 'Access-Control-Allow-Credentials' 'true';
+            add_header 'Access-Control-Allow-Methods' 'GET, PUT, POST, DELETE, OPTIONS'; #支持请求方式
+            add_header 'Access-Control-Allow-Headers' 'Content-Type,*';
+        }
+    }

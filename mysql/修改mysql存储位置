@@ -1,0 +1,73 @@
+-- 修改数据库存储目录：
+1、复制原先目录下的文件到新目录
+2、修改配置文件my.cnf的datadir=新目录
+
+/data/yinda/data/mysql
+
+============================>>>>>>>>>>>>>>>>>>>
+http://www.cnblogs.com/kerrycode/p/4371938.html
+1：确认MySQL数据库存储目录
+
+[root@DB-Server tmp]# mysqladmin -u root -p variables | grep datadir
+ 
+Enter password: 
+ 
+| datadir | /var/lib/mysql/
+
+
+2：关闭MySQL服务
+
+在更改MySQL的数据目录前，必须关闭MySQL服务。
+
+3：创建新的数据库存储目录
+
+[root@DB-Server ~]# cd /u01
+
+[root@DB-Server u01]# mkdir mysqldata
+
+4：移动MySQL数据目录到新位置
+
+[root@DB-Server ~]# mv /var/lib/mysql /u01/mysqldata/
+
+5：修改配置文件my.cnf
+
+并不是所有版本都包含有my.cnf这个配置文件，在MySQL 5.5版本，我就找不到my.cnf这个配置文件， 而有些MySQL版本该文件位于/usr/my.cnf，如果/etc/目录下没有my.cnf配置文件，请到/usr/share/mysql/下找到*.cnf文件，拷贝其中一个到/etc/并改名为my.cnf中。命令如下：
+
+clip_image003
+
+[root@DB-Server mysql]# cp /usr/share/mysql/my-medium.cnf /etc/my.cnf
+
+编辑/etc/my.cnf文件，修改参数socket
+	# The following options will be passed to all MySQL clients
+	[client]
+	#password       = your_password
+	port            = 3306
+	socket          = /u01/mysqldata/mysql/mysql.sock
+	 
+	# Here follows entries for some specific programs
+	 
+	# The MySQL server
+	[mysqld]
+	port            = 3306
+	socket          = /u01/mysqldata/mysql/mysql.sock
+	skip-external-locking
+	key_buffer_size = 16M
+	max_allowed_packet = 1M
+	table_open_cache = 64
+	sort_buffer_size = 512K
+	net_buffer_length = 8K
+	read_buffer_size = 256K
+	read_rnd_buffer_size = 512K
+	myisam_sort_buffer_size = 8M
+	
+6：修改启动脚本/etc/init.d/mysql
+
+将参数datadir修改为datadir=/u01/mysqldata/mysql/
+
+7：启动MySQL服务并验证MySQL数据库路径
+
+[root@DB-Server ~]# service mysql start
+Starting MySQL..[  OK  ]
+[root@DB-Server ~]# mysqladmin -u root -p variables | grep datadir
+Enter password: 
+| datadir        | /u01/mysqldata/mysql/ 

@@ -1,0 +1,7 @@
+新建监控脚本：tomcat-restart.sh
+新建定时任务：
+	crontab -e
+	*/10 * * * * sh /data/yinda/dlearning/cc/tomcat-restart.sh
+	
+	删除任务：crontab -r
+	启动crond服务：service crond restart

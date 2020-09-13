@@ -1,0 +1,3 @@
+解决tomcat启动项目很慢的问题 Skipping unneeded JARs during scanning can improve startup time and JSP compila...
+
+打开$JAVA_HOME/jre/lib/security/java.security这个文件,将securerandom.source的值修改为file:/dev/./urandom

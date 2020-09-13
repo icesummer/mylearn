@@ -1,0 +1,34 @@
+maven添加sqlserver的jdbc驱动包
+Posted on 2017-12-14 15:39 bwlang 阅读(4029) 评论(0) 编辑 收藏
+用 spring boot 构建项目，在pom中引入sqlserver 驱动包的时候，启动程序报错，网上搜了一下，发现maven中不支持jdbc4 一下的类库。本地maven 安装jdbc，搞定！
+
+ 
+
+http://search.maven.org/中没有sqlserver的jdbc驱动，所以需要本地安装sqljdbc的jar包，然后再在pom里面引入
+
+Step 1
+
+　　在微软官网下载sqljdbc的jar包：http://www.microsoft.com/en-us/download/details.aspx?displaylang=en&id=11774
+
+　　本次下载了4.2版本 ，可以支持jre8
+
+Step 2
+
+　　通过maven命令将jar包安装到本地。
+
+　　在有sqljdbc4.jar包的文件夹下，通过shift+右键的方式--》此处打开命令窗口，然后执行以下maven命令
+
+　　　　mvn install:install-file -Dfile=D:\ice\SDK\sqljdbc42.jar -Dpackaging=jar -DgroupId=com.microsoft.sqlserver -DartifactId=sqljdbc4 -Dversion=4.2　　
+　　　　mvn install:install-file -Dfile=D:\ice\jjar\gg-pagination.jar -Dpackaging=jar -DgroupId=com.gg.yp -DartifactId=gg-pagination -Dversion=0.0.1-SNAPSHOT　
+
+　　命令解释：mvn install:install-file -Dfile="jar包的绝对路径" -Dpackaging="文件打包方式" -DgroupId=groupid名 -DartifactId=artifactId名 -Dversion=jar版本 
+mvn install:install-file -Dfile=D:\ice\SDK\Msc.jar -Dpackaging=jar -DgroupId=com.iflytek -DartifactId=Msc -Dversion=1.0.0
+Step 3
+
+　　在pom.xml中引入本地jar包
+
+<dependency>
+    <groupId>com.microsoft.sqlserver</groupId>
+    <artifactId>sqljdbc4</artifactId>
+    <version>4.2</version>
+</dependency>

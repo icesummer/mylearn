@@ -1,0 +1,86 @@
+下载：wget http://nginx.org/download/nginx-1.12.0.tar.gz
+解压：tar -zxv -f nginx-1.12.0.tar.gz 
+或者：
+ yum install pcre*
+ yum install openssl*
+ yum install zlib 
+ yum install zlib-devel
+ yum install wget
+ yum install gcc gcc-c++
+
+cd nginx-1.12.0
+安装：
+./configure 默认配置
+OR:指定安装位置？
+./configure --prefix=/data/nginx  --conf-path=/data/nginx/conf/nginx.conf --pid-path=/data/nginx/nginx.pid --error-log-path=/data/nginx/logs/error.log --http-log-path=/data/nginx/logs/access.log --with-http_ssl_module --with-pcre=/data/pcre --with-zlib=/data/zlib --with-openssl=/data/openssl
+./configure --prefix=/data/nginx  --conf-path=/data/nginx/conf/nginx.conf --pid-path=/data/nginx/nginx.pid --error-log-path=/data/nginx/logs/error.log --http-log-path=/data/nginx/logs/access.log --with-http_ssl_module --with-zlib=/usr/include/zlib --with-openssl=/usr/include/openssl
+用这个：
+./configure --prefix=/data/nginx  --conf-path=/data/nginx/conf/nginx.conf --pid-path=/data/nginx/nginx.pid --error-log-path=/data/nginx/logs/error.log --http-log-path=/data/nginx/logs/access.log --with-http_ssl_module
+./configure --prefix=/usr/local/nginx  --conf-path=/usr/local/nginx/conf/nginx.conf --pid-path=/usr/local/nginx/nginx.pid --error-log-path=/usr/local/nginx/logs/error.log --http-log-path=/usr/local/nginx/logs/access.log --with-http_ssl_module
+(如果缺少下面的，就安装
+yum -y install pcre-devel
+yum install -y zlib-devel
+)
+
+编译安装
+make 
+make install
+whereis nginx
+启动、停止nginx
+cd /usr/local/nginx/sbin/
+./nginx 
+./nginx -s stop		此方式相当于先查出nginx进程id再使用kill命令强制杀掉进程。
+./nginx -s quit		此方式停止步骤是待nginx进程处理任务完毕进行停止。
+./nginx -s reload	重新加载配置文件
+
+重启 nginx
+1.先停止再启动（推荐）：
+对 nginx 进行重启相当于先停止再启动，即先执行停止命令再执行启动命令。如下：
+./nginx -s quit
+./nginx
+
+当 ngin x的配置文件 nginx.conf 修改后，要想让配置生效需要重启 nginx，使用-s reload不用先停止 ngin x再启动 nginx 即可将配置信息在 nginx 中生效，如下：
+./nginx -s reload
+
+pro-c	
+
+cd 源码目录
+./configure --prefix=/data/nginx --conf-path=/data/nginx/conf/nginx.conf --pid-path=/data/nginx/nginx.pid --error-log-path=/data/nginx/logs/error.log --http-log-path=/data/nginx/logs/access.log --with-http_ssl_module
+make & make install
+
+
+location = / {
+    proxy_pass http://tomcat:8080/index.html
+}
+
+
+配置开机启动
+配置nginx开机启动，切换到/lib/systemd/system目录,创建nginx.service文件
+vim nginx.service
+[Unit]
+Description=nginx
+After=network.target
+[Service]
+Type=forking
+ExecStart=/data/nginx/sbin/nginx
+ExecReload=/data/nginx/sbin/nginx reload
+ExecStop=/data/nginx/sbin/nginx quit
+PrivateTmp=true
+[Install]
+
+WantedBy=multi-user.target
+
+使用下面命令设置开机启动：
+systemctl enable nginx.service
+systemctl start nginx.service  #启动，也可以使用sbin/nginx启动
+systemctl stop nginx.service  #结束nginx 
+systemctl restart nginx.service  #重启，可使用sbin/nginx -s reload
+
+添加三方模块:
+
+~~~
+原文链接：https://blog.csdn.net/qq_38591756/article/details/82829902
+
+idea导出依赖包到lib中
+在idea的mavenproject窗口点击m字样按钮：
+dependency:copy-dependencies -DoutputDirectory=lib

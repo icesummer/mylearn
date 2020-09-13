@@ -1,0 +1,88 @@
+1、IOC的概念
+
+	对象的创建、初始化    当scope为单例、多例的时候有用
+	
+	销毁的工作   当scope为单例时有用，但是多例不起作用   当spring容器destroy时，调用销毁的工作
+	
+2、初始化的时机：
+
+	当lazy-init为默认值的情况，当spring容器启动的时候，所以被纳入到spring容器管理的bean全部创建对象
+	
+	当lazy-init为true的情况下，当调用该bean的方法时，spring容器才要查找该bean,并创建对象
+	
+	如果在配置文件中有错误的情况下，lazy-init="default"在spring容器启动的时候报错
+	
+		能够及早得发现错误
+		
+	如果在配置文件中有错误的情况下，lazy-init="true"在调用该对象的方法时报错
+	
+3、spring容器中的bean的对象在默认的情况下都是单例的
+	
+4、依赖注入：
+
+	xml文件的注入
+	
+		基本类型  String类型   value
+		
+		引用类型     ref
+	
+	注解的注入
+	
+		1、在配置文件中，导入注解解析器
+		
+			<context:annotation-config></context:annotation-config>   依赖注入的注解解析器
+			
+			@Resource  
+			
+				如果不写注解的属性（name属性），默认按照属性的名称在纳入spring管理的bean中查找相应的ID,如果有值，则给属性赋值
+				
+											如果没有值，则按照类型进行匹配，如果再找不到，报错
+											
+				如果有name属性，按照name属性的值来查找纳入spring管理的bean的ID的值，找不到则报错
+				
+			@Autowired
+			
+				指的是按照类型匹配进行查找，找不到直接报错
+				
+			@Autowired+@Qualifier==@Resource
+			
+			@Autowired+@Qualifier是不能按照类型进行匹配的
+			
+	利用注解一般情况下不在基本类型（基本类型+String）上写
+			
+5、关于注解：
+
+	1、依赖注入的注解
+	
+	2、初始化和销毁的注解
+	
+		@PostConstruct   初始化的注解
+		
+		@PreDestroy   销毁的注解   （spring容器关闭掉的情况下调用）
+		
+		
+		上述两种注解用的是同一种注解解析器
+		
+			<context:annotation-config></context:annotation-config>
+			
+	3、类扫描注解：
+		
+		类扫描的注解解析器：
+		
+		<context:component-scan base-package="cn.itcast526.spring.scan"></context:component-scan>
+		
+		统称为：典型化注解：
+		
+		@Component  泛指一个组件(类)
+		@Repository  作用同@Component，用于持久化层
+		@Service   作用同@Component，用于服务层
+		
+		就目前的版本
+		
+6、spring的继承：
+
+	1、类关系的继承关系
+	
+	2、配置文件的继承  parent
+
+	

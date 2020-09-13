@@ -1,0 +1,49 @@
+3.创建代码仓库 
+①手动创建文件夹 
+mkdir -p /var/www/svntest 
+②将创建的文件夹作为代码仓库 
+svnadmin create /var/www/svntest
+关闭命令：kill - 9 || killall svnserve
+启动命令：svnserve -d -r /opt/mybase/newsvn/repo1
+		svnserve -d -r /data/svn/svndata/repo
+修改添加用户：vi /opt/mybase/newsvn/repo1/conf/authz
+设置用户密码：vi /opt/mybase/newsvn/repo1/conf/passwd
+
+SVN可视化管理工具——Subversion Edge使用
+http://blog.csdn.net/yahohi/article/details/42463379	
+
+9418:git的端口
+
+show log都会提示 Item is not readable.
+在svnserve.conf 文件中,设置anon-access = none，如果有的把注释去掉，没的自己手动加进去就可以了.
+
+
+linux 下nginx与openssl 搭建https 服务器 subversion https 服务器
+http://blog.sina.com.cn/s/blog_9572446801019d7b.html
+http://www.jb51.net/article/59468.htm
+
+svn://192.168.1.103
+svn://122.114.245.216/yinda
+svn://119.23.76.75/yinda
+
+wget http://ftp.gnu.org/gnu/autoconf/autoconf-2.69.tar.gz
+wget http://ftp.gnu.org/gnu/libtool/libtool-1.5.6.tar.gz
+
+https://47.94.18.182/repos/repos/
+对apache_passwd密码文件添加/更新用户密码：
+htpasswd -b /data/yinda/svn/apache_passwd yaopeng yaopeng999
+htpasswd -b /data/yinda/svn/apache_passwd xiaxiaobing bingxia999
+htpasswd -b /data/yinda/svn/apache_passwd huangyoujian huangyoujian999
+htpasswd -b /data/yinda/svn/apache_passwd zhangzhen zhangzhen99
+htpasswd -b /data/yinda/svn/apache_passwd liaihui liaihui99
+htpasswd -b /data/yinda/svn/apache_passwd jiangtao jiangtao999
+htpasswd -b /data/yinda/svn/apache_passwd yanwenlong yanwenlong999
+htpasswd -b /data/yinda/svn/apache_passwd wangshuai wangshuai99
+htpasswd -b /data/yinda/svn/apache_passwd lifeilong lifeilong99
+htpasswd -b /data/yinda/svn/apache_passwd caihaibo caihaibo
+htpasswd -b /data/yinda/svn/apache_passwd huchaobing huchaobing321
+htpasswd -b /data/yinda/svn/apache_passwd wufeng wufeng321
+htpasswd -b /data/yinda/svn/apache_passwd wangchi wangchi321
+htpasswd -b /data/yinda/svn/apache_passwd opsteam opsteam321
+htpasswd -b /data/yinda/svn/apache_passwd 
+

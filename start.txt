@@ -1,0 +1,35 @@
+#启动命令所在目录
+HOME='/home/pi/Desktop/java'
+
+#获取mac地址（唯一的）
+mac=`ifconfig | grep eth0 | awk '{print $5}'`
+
+start(){
+    #进入命令所在目录
+    cd $HOME
+    nohup sudo java -jar ufoCatcher-catcher-1.0-SNAPSHOT.jar $mac wss://ip:port/catcher PULL_DOWN &
+}
+
+stop(){
+    #kill 掉所有java程序
+    ps -ef | grep java | grep -v grep |awk '{print $2}' | xargs sudo kill -9
+}
+
+case $1 in
+   start)
+      start
+   ;;
+   stop)
+      stop
+   ;;
+   restart)
+      $0 stop
+      sleep 2
+      $0 start
+    ;;
+   *)
+      echo "Usage: {start|stop|restart}"
+   ;;
+esac
+
+exit 0

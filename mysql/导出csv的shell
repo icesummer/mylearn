@@ -1,0 +1,18 @@
+# Name:test_database_backup.sh
+# This is a ShellScript For Auto DB Backup and Delete old Backup
+#备份地址
+backupdir=/www/test_backup
+#备份文件后缀时间
+time=_` date +%Y_%m_%d_%H_%M_%S `
+#需要备份的数据库名称
+db_name=emscdb
+tb_name=t_emsc_summary_his
+#mysql 用户名
+#db_user=
+#mysql 密码
+#db_pass=
+#mysqldump命令使用绝对路径
+mysql -uroot -pBingxia9651! -e "select clear_code,cc_count from $db_name.$tb_name where 1=1 " -N -s  | gzip > /opt/data/back/emsc/summary.csv.gz
+mysql -uroot -pBingxia9651! -e "select clear_code,cc_count from emscdb.t_emsc_summary_his where 1=1 " into outfile 'D:/import/importdate20170513162842.csv' fields terminated by ','lines terminated by '\n'
+
+/home/server/mysql-5.6.21/bin/mysqldump $db_name | gzip > $backupdir/$db_name$time.sql.gz

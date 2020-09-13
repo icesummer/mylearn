@@ -1,0 +1,18 @@
+：
+java核心基础
+SpringMvc,SpringBoot, ActiveMq, Maven, Shiro, Redis, Mongo, Git, Dubbo, zookeeper,
+
+Shell,Python
+Vue,Nodejs,js高级设计
+TypeScript与JavaScript
+
+Scala
+Android
+Kotlin与Go
+
+nginx，负载
+
+数据库：
+Oracle,Mysql,主从结构，负载
+Hadoop与GreenPlum
+

@@ -1,0 +1,3 @@
+idea导出依赖包到lib中
+在idea的mavenproject窗口点击m字样按钮：
+dependency:copy-dependencies -DoutputDirectory=lib

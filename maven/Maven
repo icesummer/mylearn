@@ -1,0 +1,29 @@
+我们在导出maven项目为jar包的时候，maven所依赖的jar包不在同一项目目录下，这时候我们要把所依赖的jar包一起copy到lib目录下
+mvn->>> dependency:copy-dependencies -DoutputDirectory=lib
+
+https://blog.csdn.net/wx5040257/article/details/77388901
+
+Maven:
+	Update:更新依赖包
+	build：自己配置执行目标
+		这个命令用于编译Maven工程，执行命令后会在target文件夹中的classes中生成对应的class文件。
+	Clean：
+		删除target文件夹，即删除生成的package包以及class等文件。
+	Test
+		先自动进行编译，在运行所有的测试用例。x`
+	Install：
+		发布生成对应的package包
+		
+		
+tomcat:run
+
+
+<dependencies>
+	<dependency>
+      <groupId>org.jasig.cas.client</groupId>
+      <version>3.3.3</version>
+      <artifactId>cas-client-core</artifactId>
+    </dependency>
+  </dependencies>
+
+mvn install:install-file -Dfile=D:\ice\mine\3des.jar -DgroupId=com.asiainfo.uap.util.des -DartifactId=des -Dversion=1.3 -Dpackaging=jar

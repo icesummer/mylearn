@@ -1,0 +1,83 @@
+默认端口：5432
+1、	命令行进入psql：	psql；
+	命令行查看当前数据库列表： \l  
+2、创建数据库新用户，如 dbuser：
+CREATE USER dbuser WITH PASSWORD '*****';
+3、创建用户数据库，如exampledb：
+		CREATE DATABASE exampledb OWNER dbuser;
+		CREATE DATABASE exampledb
+		[ [ WITH ] [ OWNER [=] user_name ]
+		[ TEMPLATE [=] template ]
+		[ ENCODING [=] encoding ]
+		[ LC_COLLATE [=] lc_collate ]
+		[ LC_CTYPE [=] lc_ctype ]
+		[ TABLESPACE [=] tablespace ]
+		[ CONNECTION LIMIT [=] connlimit ] ]
+		例子,指定字符集
+		CREATE DATABASE wapreader
+		WITH OWNER = wapreader
+		TEMPLATE = template0
+		ENCODING = 'UTF8'
+		C_COLLATE='C' 
+		LC_CTYPE='C'
+		TABLESPACE = tbs_wapreader
+		CONNECTION limit = 100;
+	NOTE:
+		user_name:新数据库所属用户的角色名称
+		template:新数据库使用模板的名称，缺省为template1（建议使用template0，template0是不可修改的空白数据库）。
+		lc_collate:新数据库使用的排序规则，该参数会影响到字符串的排序，比如查询语句中使用order by，以及文本类型列的索引排序，
+					缺省使用模板数据库的lc_collate
+		lc_ctype:新数据库使用的字符分类，该参数会影响字符的分类，比如大写字符、小写字符、数字，缺省使用模板数据库的lc_ctype
+		tablespace_name:新数据库相关的表空间名称，缺省使用模板数据库的表空间。
+					在该数据库中创建的所有对象缺省使用该表空间。
+					表空间实际上就是为数据库对象指定一个存储目录，例如重要的数据存储在更安全的目录下，频繁访问的数据存储在性能更好的目录，
+					不同的目录挂载不同的存储介质就可以做到数据的分类存储。
+					使用psql客户端命令\db可查看当前有哪些表空间。
+		
+4、将exampledb数据库的所有权限都赋予dbuser：
+postgres=# GRANT ALL PRIVILEGES ON DATABASE exampledb TO dbuser;
+5、使用命令 \q 退出psql：
+6、查数据库中所有的表名：select * from pg_tables; 
+7、得到所有用户自定义表的名字：select tablename from pg_tables where schemaname='public'
+"schemaname"是schema的名字。用户自定义的表，如果未经特殊处理，默认都是放在名为public的schema
+8、删除：DROP USER ux ;DROP DATABASES xx;DROP TABLE cities;
+9、消除重复的行：
+SELECT DISTINCT city FROM weather;
+10、拼接字符用||		LIKE = ILIKE
+select DISTINCT realname||username as aaa from t00_user where realname like '%'||'小'||'%';
+10、事务：
+在PostgreSQL中，开启一个事务需要将SQL命令用BEGIN和COMMIT命令包围起来。因此我们的银行事务看起来会是这样：
+BEGIN;
+UPDATE weather SET temp_hi = temp_hi - 2, temp_lo = temp_lo - 2
+    WHERE date > '1994-11-28';
+COMMIT;
+11、自增：
+在PostgreSQL中实现自增还需要生成一个sequence再调用它才能实现。
+在生成sequence语句中，后面有几个参数，从左到右依次表示：
+	该序列的步长，允许最小值，允许最大值（在上面代码中为NO MAXVALUE即没定义最大值），起始值。
+CREATE SEQUENCE sys_file_id_seq INCREMENT BY 1 MINVALUE 1 NO MAXVALUE START WITH 170;
+CREATE TABLE sys_file (
+  id bigint NOT NULL DEFAULT NEXTVAL('sys_file_id_seq'),
+  filename varchar(1000) NOT NULL,
+  PRIMARY KEY (id)
+);
+12、时间戳的更新：
+
+
+
+
+
+
+
+PostgreSQL特殊语法：
+1、	Limit：
+	limit n
+	limit n offset m
+
+数组类型
+	一维：select array[1,2,3,4];
+	多维：select array[[1,2],[3,4]]; 
+	create table tbl_array(a int[],b varchar(32)[][],c int);
+	insert into tbl_array (a,b,c) values (array[1,2],array[[1,2,3],[4,5,6]],1);
+	select a[2:3] from tbl_array ;
+	select a[1],b[2][4] from tbl_array where c = 1;

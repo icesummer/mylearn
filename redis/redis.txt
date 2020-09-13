@@ -1,0 +1,57 @@
+1、打开一个 cmd 窗口 使用cd命令切换目录到 C:\redis 运行 redis-server.exe redis.windows.conf 。
+如果想方便的话，可以把 redis 的路径加到系统的环境变量里，这样就省得再输路径了，
+后面的那个 redis.windows.conf 可以省略，如果省略，会启用默认的。输入之后，会显示如下界面：
+
+2、这时候另启一个cmd窗口，原来的不要关闭，不然就无法访问服务端了。
+切换到redis目录下运行 redis-cli.exe -h 127.0.0.1 -p 6379 。
+设置键值对 set myKey abc
+取出键值对 get myKey
+
+Linux下 安装Redis并配置服务
+https://blog.csdn.net/congcong68/article/details/52729877
+
+cp utils/redis_init_script /etc/rc.d/init.d/redis
+  第一步：EXEC=/usr/redis/redis-2.8.13/src/redis-server
+         CLIEXEC=/usr/redis/redis-2.8.13/src/redis-cli
+            
+  第二步：PRIDFILE=/var/run/redis.pid
+          
+  第三步：
+         #mkdir  /etc/redis
+         #cp  /usr/local/redis/redis.conf  /etc/redis/6379.conf
+
+  第四步：
+         # vi   /etc/redis/6379.conf   
+                把daemonize no改为 daemonize yes
+
+service redis start  /service redis stop
+
+1)打开配置文件把下面对应的注释掉
+# bind 127.0.0.1 
+
+2)Redis默认不是以守护进程的方式运行，可以通过该配置项修改，使用yes启用守护进程，
+daemonize no
+
+3)保护模式
+protected-mode no 
+
+
+下面的错误是因为保护模式没有关闭产生的
+DENIED Redis is running in protected mode because protected mode is enabled
+
+外网测试返回PONG代表成功
+./redis-cli -h 公网IP -p 6379
+公网IP:6379> ping
+PONG
+
+设置密码：6379.conf:pass yindatech...123
+客户端连接：
+	redis-cli -h 119.23.76.75 -p 6379 -a yindatech...123 或者
+		#redis-cli -h 119.23.76.75 -p 6379
+		#auth yindatech...123
+config get requirepass
+
+redis-cli -h 119.23.76.75 -p 6379 shutdown
+redis-server
+
+keys * 查看所有key

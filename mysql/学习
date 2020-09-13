@@ -1,0 +1,265 @@
+怎么去除 数据库中  重复的数据
+大图加载内存泄露怎么处理。
+listview很复杂，出现卡顿怎么处理
+你在项目中用到哪些设计模式
+linkmap,hashmap 的区别
+让你做图片缓存你会怎么做
+Zhengzhou Gainet Network Technology Co.，Ltd.
+=====================================================================================================================================================
+（一）MYSQL ： ---->>>
+date和datetime可表示的时间范围为'1000-01-01'到'9999-12-31'，timestamp由于受32位int型的限制，能表示'1970-01-01 00:00:01'到'2038-01-19 03:14:07'的UTC时间。
+-- 01、 修改表（列）
+CREATE DATABASE `kk` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci; --  创建数据库
+ALTER TABLE sendprice_area RENAME finance_sendprice_area; -- 表名
+ALTER TABLE _wz CHANGE syurl Syurl VARCHAR(300);
+ALTER TABLE _wz MODIFY COLUMN syurl Syurl VARCHAR(300);
+ALTER TABLE _wz ADD COLUMN yylb BIGINT DEFAULT 1 COMMENT'默认值1';
+-- 02、 索引：
+CREATE INDEX index_placeid ON place (gjdm);
+DROP INDEX zt_dwmc ON _zthmd; 
+ALTER TABLE _zthmd DROP INDEX zt_dwmc;
+-- 03、 IP转换:
+SELECT INET_ATON('192.168.100.216');
+SELECT INET_NTOA('3232261336');
+-- 04、 mysql中long时间的转换:
+select unix_timstamp("2009-09-15 00：00：00");
+select from_unixtime(1252999488);
+-- 05、 正则匹配查询(模糊匹配)：
+SELECT id,Nrlx_id,Qzsph,Spwj FROM _wz WHERE Nrlx_id REGEXP BINARY '([1-9],?)+';
+SELECT Nrlx_id,SUBSTRING_INDEX(SUBSTRING_INDEX(qzsph,',',Nrlx_id),',',-1) a ,Qzsph FROM _wz WHERE Nrlx_id REGEXP BINARY '([1-9],?)+' AND Spwj LIKE'%/%jpg%';
+-- 06、 返回date的星期索引(0=星期一，1=星期二, ……6= 星期天)。 
+SELECT WEEKDAY('1997-10-04 22:23:00'); 
+-- 07、 产生随机数 
+CONCAT(20,FLOOR(0+(RAND()*2)),FLOOR(0+(RAND()*10)));
+RAND()产生>0AND<1的值
+-- 08、 截取字符串：
+	SUBSTRING_INDEX(str,'a','从第几个a字符开始[负号表示从右边向左]'):
+	SUBSTRING(str,'数字，从第几个字符开始[负号表示从右边向左]'):
+	LEFT(Fzr_sjhm,11):左边11位
+-- 09、 拼接，把多行拼接为一行，：
+SELECT  GROUP_CONCAT(Wzmc ORDER BY Wzmc SEPARATOR ',' ),GROUP_CONCAT(Syurl SEPARATOR ',' ) from _wz GROUP BY main_id;
+-- 10、拼接，把多列并成一列(并替换):
+eg:[/Down/2010/08/11,20100811104010_ha_5085.xml-->/download/2010/08/11/20100811104010_ha_5085.zip]
+SELECT REPLACE(CONCAT(DownFilePath,'/',REPLACE(Return_FileName,'xml','zip')),'Down','download') xmls from icpinfo._down;
+-- 11、表迁移
+INSERT INTO _updown (xml_id,xml_type,yxzt,ztid,gtime)
+SELECT fzr_yypic,2,1,id,qysb FROM _zhuti WHERE fzr_yypic IS NOT NULL AND fzr_yypic REGEXP BINARY '([1-9])+' AND fzr_yypic NOT LIKE'/Photo%';
+-- 12、产生顺序列号
+SELECT * FROM (SELECT @x:=IFNULL(@x,0)+1 AS rownum FROM zdb,(SELECT (@x :=0) ) b WHERE @x<12) aa
+-- 13、日期（对日期时间进行加减法运算）
+DATE_ADD(date,INTERVAL expr type)
+DATE_SUB(date,INTERVAL expr type) 
+ADDDATE(date,INTERVAL expr type) 
+SUBDATE(date,INTERVAL expr type)
+　(ADDDATE()和SUBDATE()是DATE_ADD()和DATE_SUB()的同义词,也可以用运算符 和-而不是函数
+　date是一个DATETIME或DATE值,expr对date进行加减法的一个表达式字符串type指明表达式expr应该如何被解释
+　[type值 含义 期望的expr格式]:
+　SECOND 秒 SECONDS 
+　MINUTE 分钟 MINUTES 
+　HOUR 时间 HOURS 
+　DAY 天 DAYS 
+　MONTH 月 MONTHS 
+　YEAR 年 YEARS 
+　MINUTE_SECOND 分钟和秒 "MINUTES:SECONDS" 
+　HOUR_MINUTE 小时和分钟 "HOURS:MINUTES" 
+　DAY_HOUR 天和小时 "DAYS HOURS" 
+　YEAR_MONTH 年和月 "YEARS-MONTHS" 
+　HOUR_SECOND 小时, 分钟， "HOURS:MINUTES:SECONDS" 
+　DAY_MINUTE 天, 小时, 分钟 "DAYS HOURS:MINUTES" 
+　DAY_SECOND 天, 小时, 分钟, 秒 "DAYS HOURS:MINUTES:SECONDS"
+　expr中允许任何标点做分隔符,如果所有是DATE值时结果是一个DATE值,否则结果是一个DATETIME值)
+　如果type关键词不完整,则MySQL从右端取值,DAY_SECOND因为缺少小时分钟等于MINUTE_SECOND)
+　如果增加MONTH、YEAR_MONTH或YEAR,天数大于结果月份的最大天数则使用最大天数) 
+	mysql> SELECT "1997-12-31 23:59:59" INTERVAL 1 SECOND; 
+	　　-> 1998-01-01 00:00:00 
+	mysql> SELECT INTERVAL 1 DAY "1997-12-31"; 
+	　　-> 1998-01-01 
+	mysql> SELECT "1998-01-01" - INTERVAL 1 SECOND; 
+	　　-> 1997-12-31 23:59:59 
+	mysql> SELECT DATE_ADD("1997-12-31 23:59:59",INTERVAL 1 SECOND); 
+	　　-> 1998-01-01 00:00:00 
+	mysql> SELECT DATE_ADD("1997-12-31 23:59:59",INTERVAL 1 DAY); 
+	　　-> 1998-01-01 23:59:59 
+	mysql> SELECT DATE_ADD("1997-12-31 23:59:59",INTERVAL "1:1" MINUTE_SECOND); 
+	　　-> 1998-01-01 00:01:00 
+	mysql> SELECT DATE_SUB("1998-01-01 00:00:00",INTERVAL "1 1:1:1" DAY_SECOND); 
+	　　-> 1997-12-30 22:58:59 
+	mysql> SELECT DATE_ADD("1998-01-01 00:00:00", INTERVAL "-1 10" DAY_HOUR);
+	　　-> 1997-12-30 14:00:00 
+	mysql> SELECT DATE_SUB("1998-01-02", INTERVAL 31 DAY); 
+	　　-> 1997-12-02 
+	mysql> SELECT EXTRACT(YEAR FROM "1999-07-02"); 
+	　　-> 1999 
+	mysql> SELECT EXTRACT(YEAR_MONTH FROM "1999-07-02 01:02:03"); 
+	　　-> 199907 
+	mysql> SELECT EXTRACT(DAY_MINUTE FROM "1999-07-02 01:02:03"); 
+	　　-> 20102 
+	TO_DAYS(date) 
+	　返回日期date是西元0年至今多少天(不计算1582年以前)
+	
+	SELECT CONVERT_TZ(NOW(), '+08:00', '-05:00');-- 东八区时间转为西五区时间
+	SELECT CONVERT_TZ('2017-09-11 21:00:07', '-05:00', '+08:00');
+	
+查看用户权限
+SHOW GRANTS FOR 'dlearning'@'%';
+创建用户和授权
+CREATE USER 'wylte'@'%' IDENTIFIED BY 'Wylte!5ylte';
+GRANT SELECT,INSERT,UPDATE,REFERENCES,DELETE,CREATE, DROP,ALTER,INDEX,CREATEVIEW,SHOW VIEW ON wylte.* TO 'wylte'@'%';
+
+CREATE DATABASE `nm_freecar`CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+CREATE USER 'freecar'@'%' IDENTIFIED BY 'Freecar123!';
+GRANT ALL ON freecar.* TO 'nm_freecar'@'%'; 
+show processlist;
+show status;
+=====================================================================================================================================================
+（二）消息队列
+	service rabbitmq-server start 启动rabbitmq命令
+	service rabbitmq-server restart 重启
+	xxdl.123 215密码
+	http://192.168.100.215:15672/	web管理
+=================================================================================================================================================
+（三）LINUX、  
+----------------------------------------------------
+	  -----------------LINUX----------------
+	  linux 进程操作
+	  ：查找某进程 ps -ef | grep java
+	  ：查找所有进程 ps -ef 
+	  shutdown now立即关机	 shutdown +2两分后关机
+	       关闭iptables 和 selinux 方法： #service iptables stop #关闭iptables服务#chkconfig iptables off #开机不启动关闭
+	  -----------------LINUX----------------
+----------------------------------------------------
+=====================================================================================================================================================
+（四）、配置虚拟路径并建立相应文件夹。
+
+=====================================================================================================================================================
+（五）、java 命令
+01、使用jaxb根据xsd逆向生成java代码。
+	1	 首先是配置好java的环境变量，将java安装目录下bin文件夹下的xjc.exe配到classpath下 
+	2 	进入到你的xsd的文件夹下，在cmd模式下执行 :xjc -p com.ebupt a.xsd -d abc 
+		说明： xjc -p 包的路径 xsd的名字.xsd -d 目标的文件夹 
+	3	eg:E:\work_space\imageTo\WebRoot\接口规范V3.0\XSD>xjc -p com.xsd.downConfirmMethod DownloadDataConfirmMethodCallReturn.xsd -d E:\work_space\imageTo\src\
+02、将mybatis-spring 文件夹下的class文件打包成 jar文件
+	1	cmd操作窗体中进入class文件的根目录,之所以说根目录,是因为下面其下面还可以有很多文件包(夹);
+	2	在此目录准备好一个manifest.mf文件,其内容为:
+		Manifest-Version: 1.0
+		Created-By: 1.5.0_06 (Sun Microsystems Inc.)
+		Main-Class: MainEntry（多个时？）
+		main-class为指定所有类的main方法所在的类名.
+	3	最后用命令: jar cvfm jarname.jar manifest.mf *
+	4	eg:	D:\MY\book\mybatis\mybatis-spring>jar cvfm mybatis-spring.jar manifest.mf *
+
+=====================================================================================================================================================
+（六）、正则表达式之【非】（否定顺序环视）：http://www.cnblogs.com/bvbook/archive/2010/11/03/1867775.html
+01、匹配不以.png|.gif|.jpg结尾的
+	var http=/^(?:(?!((\.gif)|(\.png)|(\.jpg))$).)+$/;
+	http.test("sacatw.gif");
+02、匹配不以www.开头的endswidth
+	var http=/^(?:(?!^www\.).)*$/;
+	http.test("www.sa.sdf");
+03、匹配不包含cat的
+	var http=/^(?:(?!cat).)+$/;
+	http.test("sacatw.asdf");
+=====================================================================================================================================================
+（七）JS ： ---->>>
+-- 1、JS跳转到桌面
+<script type="text/javascript">location="/";</script>
+-- 2、JS以？结尾
+String.prototype.endWith=function(endStr){
+  var d=this.length-endStr.length;
+  return (d>=0&&this.lastIndexOf(endStr)==d)
+}
+-- 3 安装jdk
+下载jdk-6u45-linux-x64.bin，到usr/java6/下
+执行chmod +x jdk-6u45-linux-x64.bin附所有权限
+执行./jdk-6u45-linux-x64.bin执行安装
+配置环境变量：
+	linux下配置环境变量和windows的原理是相同，都是使jdk的路径成为全局变量，用文本编辑器gedit（如果没安装可以用vi）打开/etc/profile，在文件最后添加
+	export JAVA_HOME=/usr/java/jdk1.6.0_45
+	export PATH=$JAVA_HOME/bin:$PATH
+	export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar
+	jdk1.6.0_45改为你安装的jdk的文件夹名称
+	保存后注销或重启
+输入java -version测试
+
+-- 安装apache-tomcat-6.0.24.tar.gz：
+1、 上传apache-tomcat-6.0.24.tar.gz和jdk-6u13-linux-i586.bin至/usr/local
+给这两个文件添加可执行的权限
+# chmod +x apache-tomcat-6.0.24.tar.gz  jdk-6u13-linux-i586.bin
+2、执行如下命令安装tomcat：
+#cd /usr/local
+#tar zxvf apache-tomcat-6.0.24.tar.gz
+解压完成后将apache-tomcat-6.0.24重命名为tomcat
+在/etc/profile文件配置环境变量
+#source profile 命令立即生效
+#sh startsh.sh
+1qazSE$32w
+centos 安装mysql
+1、卸载掉原有mysql 
+# rpm -qa | grep mysql　　// 这个命令就会查看该操作系统上是否已经安装了mysql数据库
+ 或者 yum list installed | grep mysql
+#rpm -e mysql　　// 普通删除模式
+或者 yum -y remove mysql-libs.x86_64 // yum卸载，若有多个依赖文件则依次卸载
+#[root@xiaoluo ~]# rpm -e --nodeps mysql　　// 强力删除模式，如果使用上面命令删除时，提示有依赖的其它文件，则用该命令可以对其进行强力删除
+2、通过yum来进行mysql的安装
+输入 yum list | grep mysql 命令来查看yum上提供的mysql数据库可下载的版本：
+通过输入 yum install -y mysql-server mysql mysql-devel 命令将mysql mysql-server mysql-devel都安装好
+rpm -qi mysql-server查看刚安装好的mysql-server的版本|
+在安装完mysql数据库以后，会发现会多出一个mysqld的服务，这个就是咱们的数据库服务，我们通过输入 service mysqld start 
+# service mysqld restart
+在使用mysql数据库时，都得首先启动mysqld服务，我们可以 通过  chkconfig --list | grep mysqld 命令来查看mysql服务是不是开机自动启动，如：
+mysqld服务并没有开机自动启动，我们当然可以通过 chkconfig mysqld on 命令来将其设置成开机启动，这样就不用每次都去手动启动了
+mysqladmin -u root password 'root'　　// 通过该命令给root账号设置密码为 root
+
+Linux下打包压缩war和解压war包
+把当前目录下的所有文件打包成game.war
+jar -cvfM0 game.war ./
+
+-c   创建war包
+-v   显示过程信息
+-f    
+-M
+-0   这个是阿拉伯数字，只打包不压缩的意思
+解压game.war
+
+jar -xvf game.war
+
+解压到当前目录
+jar {ctxu}[vfm0M] [jar-文件] [manifest-文件] [-C 目录] 文件名 ...
+其中 {ctxu} 是 jar 命令的子命令，每次 jar 命令只能包含 ctxu 中的一个，它们分别表示：
+-c　创建新的 JAR 文件包
+-t　列出 JAR 文件包的内容列表
+-x　展开 JAR 文件包的指定文件或者所有文件
+-u　更新已存在的 JAR 文件包 (添加文件到 JAR 文件包中)
+[vfm0M] 中的选项可以任选，也可以不选，它们是 jar 命令的选项参数
+-v　生成详细报告并打印到标准输出
+-f　指定 JAR 文件名，通常这个参数是必须的
+-m　指定需要包含的 MANIFEST 清单文件
+-0　只存储，不压缩，这样产生的 JAR 文件包会比不用该参数产生的体积大，但速度更快
+-M　不产生所有项的清单（MANIFEST〕文件，此参数会忽略 -m 参数
+[jar-文件] 即需要生成、查看、更新或者解开的 JAR 文件包，它是 -f 参数的附属参数
+[manifest-文件] 即 MANIFEST 清单文件，它是 -m 参数的附属参数
+
+
+
+
+
+
+
+
+
+
+
+
+
+=====================================================================================================================================================
+keytool -genkey -alias wsria -keyalg RSA -keystore d:/MY/keys/wsriakey
+keytool -export -file d:/MY/keys/wsria.crt -alias wsria -keystore d:/MY/keys/wsriakey
+keytool -import -keystore C:\bing\Java\jdk1.6.0_10\jre\lib\security\cacerts -file D:/MY/keys/wsria.crt -al
+
+在服务器密钥交换握手信息中 SSL 收到了一个弱临时 Diffie-Hellman 密钥。 （错误码： ssl_error_weak_server_ephemeral_dh_key）
+=====================================================================================================================================================
+wechatLoginDirectUrl:http://192.168.12.32:8080/beian/mobile/wechat/wechatLogin,
+wechatOpenAppid:wx5fa2c7b2ef79c3dc,
+wechatBoundDirectUrl:http://192.168.12.32:8080/beian/mobile/wechat/boundWechat,
+wechatSercret:c722a77d5fac4a5986d97d06905b1beb
+备案系统ngnix重定向https

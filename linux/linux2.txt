@@ -1,0 +1,22 @@
+# groupmod -g 102 group2
+此命令将组group2的组标识号修改为102。
+ useradd -g chuang -d /home/chuang -m chuang
+ password chuang
+ yinda_zz
+ 
+ chgrp命令来改变文件所在用户组。
+ chown -R chuang /data //修改文件拥有者为 chuang 
+ 
+jxc: start:8090	shutdown:9090	ajp:
+ps -ef |grep java | awk '{print $2}'|xargs pwdx 打印出java进程所在的程序目录
+
+
+ssh hwshws@10.97.144.14
+
+
+
+
+
+
+# useradd -s /bin/sh -g group –G adm,root gem
+此命令新建了一个用户gem，该用户的登录Shell是 /bin/sh，它属于group用户组，同时又属于adm和root用户组，其中group用户组是其主组。

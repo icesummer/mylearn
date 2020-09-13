@@ -1,0 +1,31 @@
+#启动apache：
+/usr/local/apache2/bin/apachectl -k start
+apachectl restart
+
+#首先，生成2048位的加密私钥
+openssl genrsa -out sslserver.key 2048
+
+#然后，生成证书签名请求（CSR），这里需要填写许多信息，如国家，省市，公司等
+openssl req -new -key sslserver.key -out sslserver.csr
+	ZH
+	HA
+	ZZ
+	SHANGHAIYINDAKEJI
+	ZH
+	yindatech.com
+	xiaxiaobing@mail9-yinda.com
+	yindatech_ssl
+	SHANGHAIYINDAKEJI
+#最后，生成类型为X509的自签名证书。有效期设置3650天，即有效期为10年
+openssl x509 -req -days 3650 -in sslserver.csr -signkey sslserver.key -out sslserver.crt
+<VirtualHost *:443>
+    SSLEngine on
+    SSLCertificateFile /etc/pki/tls/certs/sslserver.crt
+    SSLCertificateKeyFile /etc/pki/tls/private/sslserver.key
+    <Directory /var/www/html/virtual-web>
+        AllowOverride All
+    </Directory>
+    ServerAdmin root@localhost
+DocumentRoot /var/www/html/virtual-web
+ServerName localhost:443
+</VirtualHost>

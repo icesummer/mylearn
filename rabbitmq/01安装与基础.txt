@@ -1,0 +1,30 @@
+﻿1.安装：
+rabbitmq官网下载安装包，并找到对应的erlang的版本
+在erlang官网下载对应版本的erlang包
+    otp_win64_21.3.exe  rabbitmq-server-3.8.1.exe
+在rabbitmq安装目录的sbin目录\可手动启动关闭移除服务
+卸载时注意清除注册表：rabbit和erlsrv相关
+2.安装web管理插件
+命令行进入sbin目录 管理员执行命令rabbitmq-plugins.bat enable rabbitmq_management
+web管理端口为15672   http://localhost:15672/   guest/guest
+默认服务端口为 5672
+3.maven:
+    <dependency>
+        <groupId>com.rabbitmq</groupId>
+        <artifactId>amqp-client</artifactId>
+        <version>5.7.3</version>
+    </dependency>
+
+4.mq基本流程：
+发送端：
+    创建连接
+    建立通道
+    声明队列
+    发送消息
+接收端：
+    创建连接
+    建立通道
+    声明队列
+    监听队列
+    接收消息
+    ack回复

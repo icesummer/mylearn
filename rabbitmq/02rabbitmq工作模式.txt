@@ -1,0 +1,69 @@
+﻿6种工作模式
+    1.Work Queues   工作队列
+    2.Publish/Subscribe  发布订阅
+    3.Routing       路由
+    4.Topics        通配符
+    5.Header        Header转发器
+    6.RPC           远程过程调用
+
+1>     Work Queues   工作队列
+    多个消费者共同消费同一个队列的消息，rabbit采用轮询的方式给平均分配给所有监听的消费者
+    交换机为空使用默认的，路由key填写为队列名称
+2>     Publish/Subscribe  发布订阅
+    type=BuiltinExchangeType.FANOUT
+    生产者将消息发给交换机<>
+    交换机将消息转发到绑定到此交换机的所有队列，每个绑定交换机的队列都将接收到该消息
+    与交换机绑定的多个队列，每个消费者监听自己的队列
+    如果消息发到没有绑定队列的交换机上，消息将消失
+    启动多个生产者和消费者就是发布订阅与工作队列模式的结合
+    生产者：
+        建立连接Connection
+        建立会话通道channel
+        声明队列(n个)
+        声明交换机
+        交换机队列绑定
+        发送消息给交换机
+    消费者：
+        建立连接Connection
+        建立会话通道channel
+        声明队列
+        声明交换机
+        交换机队列绑定
+        监听队列
+        接收消息
+
+3>     Routing  路由工作模式<可以代替pub/sub模式>
+    声明交换机时type=BuiltinExchangeType.DIRECT
+    一个交换机绑定多个队列，每个队列设置一个或多个routingKey，
+    生产者发送消息给交换机，同时指定routingKey，交换机将消息发到相同routingKey的队列上
+    消费者监听自己的队列
+    channel.queueBind(QUEUE_EMS,EXCHANGE_FANOUT_INFORM,ROUTINGKEY_info);
+    channel.queueBind(QUEUE_SMS,EXCHANGE_FANOUT_INFORM,ROUTINGKEY_warn);
+    channel.queueBind(QUEUE_SMS,EXCHANGE_FANOUT_INFORM,ROUTINGKEY_info);
+    
+4>     Topics  通配符模式
+    声明交换机时type=BuiltinExchangeType.Topic
+    Topics与Routing基本原理相同，消息匹配队列的方式不同，
+    Routing是相等匹配，Topics是通配符匹配
+    符号# ：匹配一个或多个，比如：inform.# 匹配inform.ems.sms,inform.ems,inform.sms
+    符号* ：只能匹配一个，比如：inform.* 匹配inform.ems,inform.sms
+
+5>     Header  Header模式
+    声明交换机时type=BuiltinExchangeType.HEADERS
+    Header模式取消RoutingKey，使用header中的key/value(键值对)绑定队列
+    channel.queueBind(QUEUE_EMS,EXCHANGE_HEADER_INFORM,"",headerMap);
+    发送时，将键值对放入props中，routingKey设置为空
+    channel.basicPublish(EXCHANGE_HEADER_INFORM,"",props.build(),message.getBytes());
+5>     RPC  RPC模式
+    声明交换机时type=BuiltinExchangeType.DIRECT
+    RPC即客户端远程调用服务端的方法，使用MQ可实现RPC的异步消息，基于Direct交换机实现
+    1.客户端是生产者又是消费者，向RPC请求队列发送RPC调用消息，同时监听RPC响应队列；
+    2.服务端监听RPC请求的队列消息，收到消息后执行服务器的方法，得到方法返回的结果
+    3.服务端将RPC方法的结果发送到RPC响应队列；
+    channel.basicPublish(EXCHANGE_HEADER_INFORM,"",props.build(),message.getBytes());
+
+Springboot 整合rabbitmq
+创建生产端和消费端两套代码
+配置aplication.yml和logback.xml
+设置配置类：RabbitmqConfig，声明交换机，队列，绑定队列等Bean
+编写生产者代码：

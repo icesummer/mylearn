@@ -1,0 +1,15 @@
+git pull
+git add .
+git commit -m "my yml"
+
+git push origin master
+
+更新时允许不想关的历史提交
+git pull origin master --allow-unrelated-histories
+
+同步到develop???
+git push origin develop -f
+
+
+git revert -m 1 a99a2568968fd90e4e913547bb027a96f3466d01
+git revert 2935a13e34ef972cfced6fbe7ef7496bc31ac41a

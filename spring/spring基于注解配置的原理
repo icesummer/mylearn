@@ -1,0 +1,31 @@
+1、目标类和切面必须纳入spring管理范围
+
+	在配置文件中声明目标类和切面
+	
+	 <bean id="personDaoImpl" class="cn.itcast526.spring.aopannotation.PersonDaoImpl"></bean>
+	 
+	 <bean id="transaction" class="cn.itcast526.spring.aopannotation.Transaction"></bean>
+	 
+当spring容器启动的时候，会扫描纳入spring容器管理的所以的类，会在类上检查是否有注解@Aspect的存在，如果存在，则会认为这个类就是切面。如果是切面会继续扫描方法
+
+看方法上有没有@Pointcut，如果有这个注解，则会把切入点表达式提取出来。这个过程中也会扫描方法中的@Before等注解，然后会根据切入点表达式扫描纳入spring管理的所有的bean，如果有一个bean符合切入点表达式，则会创建这个类的代理对象
+
+在创建代理对象的同时，会把通知和目标方法结合起来
+
+
+
+在基于AOP的做法中
+
+两种做法：
+
+	xml
+	
+		书写比较麻烦
+		
+		但是效率比较高
+	
+	annotation
+	
+		书写比较简单
+		
+		效率比较低

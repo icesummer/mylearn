@@ -1,0 +1,37 @@
+导出文本形式的csv：
+mysql -uroot -pBingxia9651! -e "select clear_code,cc_count from emscdb.t_emsc_summary_his where 1=1 " -N -s | sed -e 's/^/"/g;s/$/"\n/g' | gzip > /opt/data/back/emsc/summary.csv
+mysql -uroot -pBingxia9651! -e "select clear_code,cc_count from emscdb.t_emsc_summary_his where 1=1 " -N -s  > /opt/data/back/emsc/summary.csv
+导出excel形式？的csv
+mysql -u root --password=Bingxia9651! --database=emscdb --execute='select clear_code,cc_count from emscdb.t_emsc_summary_his where 1=1 ' -X > /opt/data/back/emsc/summary2.csv
+
+
+
+
+
+
+资料：
+
+方案有很多种，我这里简单说一下：
+1.  into outfile
+复制代码 代码如下:
+
+SELECT * FROM mytable  
+ INTO OUTFILE '/tmp/mytable.csv'  
+ FIELDS TERMINATED BY ','  
+ OPTIONALLY ENCLOSED BY '"'  
+ LINES TERMINATED BY '\n';
+ 
+在我使用过程中发现一个特别严重问题，这里面不能插入查询条件，比如where这些，也就是说只能整表导出，不知道是不是我的写法有问题，有知道朋友请给我留言。
+第二个问题是，outfile的路径一定要有写权限，我们mysql的进程权限一般是mysql用户，因此最好导出到/tmp目录下面。
+2. 通过结合sed
+复制代码 代码如下:
+
+mysql -uroot test -e "select ip from server where a.name like '%abc%'"  -N -s | sed -e 's/^/"/g;s/$/"\n/g'; > /tmp/test.csv
+这里首先使用mysql命令的-e参数来执行sql语句，然后通过-N来去掉输出结果中列名，-s去掉输出结果中的各种划线。
+然后使用sed命令输出结果中所有相关数据进行替换，其中替换了三处，1.在行首增加“，在行尾增加”和换行，在每个字段之间增加”,”来分隔。
+3. 通过mysqldump来实现
+复制代码 代码如下:
+
+mysqldump -u username -p -t  -T/path/to/directory dbname table_name --fields-terminated-by=',' 
+和1的方案差不多吧。
+就当是一个笔记吧

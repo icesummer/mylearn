@@ -1,0 +1,70 @@
+java的反射机制：
+
+1、概念：
+
+	在运行时，通过一个类的全名（包名+类名）的字符串表示形式去classpath路径下，查找相应的类。找到类以后，会把这个类封装在一个类中
+	
+	
+	Class   类的类    第一个类的概念：他本身是一个类   第二个类的概念：  Class这个类可以封装一个类
+	
+	
+	int a = 6;
+	
+	Person p = new Person();   Object o = p;
+	
+	
+	Class  是用于接收所有的类
+	
+	
+	Method  所有的方法全部可以放入到method这个类里
+	
+	Field  是封装所有的字段
+	
+2、好处：
+
+	class A{
+		B b;
+	}
+	
+	用java的反射机制就会取消这种依赖性
+	
+	因为java的反射机制是在运行的时候才要查询相应的类
+	
+	
+	速度比较慢
+	
+	
+	通过正常的方法可以得到的一些信息可以通过java的反射机制也可以得到
+	
+	
+	
+调用某一个方法：
+
+	1、把这个方法放入到Method类中
+	
+		通过两种方式来把一个方法封装到method类中
+		
+			getMethod(String name,Class type)  name  方法的名称   type是方法的参数的类型   Method
+			
+			
+			getMethods   所有的方法
+	
+	2、通过invoke方法调用
+	
+	
+		invoke(Object obj,Object... args)   obj调用该方法的对象    args   方法的参数
+		
+		
+		Person p = new Person();
+		p.savePerson();
+		
+		
+		=============
+		
+		Class personClass = Class.for("a.Person");
+		Method method = personClass.getMethod("savePerson",new Object[]{});
+		method.invoke(personClass.newInstance());
+	
+	
+
+	
