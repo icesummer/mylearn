@@ -1,0 +1,35 @@
+systemctl status vsftpd.service
+
+检查安装vsftpd软件
+使用如下命令#
+
+rpm -qa |grep vsftpd
+可以检测出是否安装了vsftpd软件，如果没有安装，使用YUM命令进行安装
+
+yum install vsftpd -y
+2、启动服务
+使用vsftpd软件，主要包括如下几个命令：
+
+启动ftp命令
+#service vsftpd start
+#systemctl start vsftpd.service
+停止ftp命令
+#service vsftpd stop
+重启ftp命
+#service vsftpd restart
+
+useradd -d /home/hcftp -s /sbin/nologin
+useradd -d /home/hcftp -s /sbin/nologin -g ftp -G root hcftp
+useradd -d /data/web/hc_community/hcftp -s /sbin/nologin -g ftp -G root hcftp
+
+passwd hcftp
+123456
+
+chown hcftp /data/web/hc_community/hcftp
+
+chown -R root:hcftp /home/hcftp
+
+
+https://hsk.oray.com/news/8561.html
+
+http://www.mamicode.com/info-detail-1821902.html
