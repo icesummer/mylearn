@@ -212,7 +212,7 @@ centos7下的端口例外
 	firewall-cmd --state #查看默认防火墙状态
 	firewall-cmd --permanent --list-ports #列出防火墙的例外
 	firewall-cmd --permanent --add-port=8080/tcp --permanent #添加列外端口| --permanent表示永久生效
-	firewall-cmd --zone=public --remove-port=8999/udp --permanent	#删除例外端口
+	firewall-cmd --zone=public --remove-port=8999/udp --permanent	#删除udp的例外端口
 	firewall-cmd --complete-reload
 	这里改为iptables防火墙：
 	firewall：

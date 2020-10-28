@@ -1,0 +1,75 @@
+https://www.cnblogs.com/xhq1024/p/10671395.html、
+
+
+
+Maven 打包项目到私服 (deploy)
+一、配置maven
+　　在maven安装目录 /conf/setting.xml 中的servers下添加：
+
+复制代码
+ 1 <servers>
+ 2      <server>
+ 3        <id>nexus-snapshots</id>
+ 4        <username>admin</username>
+ 5        <password>123456</password>
+ 6      </server>
+ 7      <server>
+ 8        <id>nexus-releases</id>
+ 9        <username>admin</username>
+10        <password>123456</password>
+11      </server>
+12 </servers>
+复制代码
+二、配置pom
+　　在maven工程的pom.xml配置部署的仓库，注意pom.xml和setting.xml中的id属性要一致
+
+复制代码
+ 1 <!-- 发布maven私服 -->
+ 2 <distributionManagement>
+ 3       <repository>
+ 4           <id>nexus-snapshots</id>
+ 5           <name>tuohang-framework-SNAPSHOTS</name>
+ 6           <url>http://47.100.xxx.xxx:30010/repository/3rd-part/</url>
+ 7       </repository>
+ 8       <snapshotRepository>
+ 9           <id>nexus-repository</id>
+10           <name>tuohang-framework-REPOSITORY</name>
+11           <url>http://47.100.xxx.xxx:30010/repository/3rd-part/</url>
+12       </snapshotRepository>
+13 </distributionManagement>
+复制代码
+三、使用deploy命令上传
+　　在项目路径下使用命令：
+
+　　mvn deploy -Dmaven.test.skip=true
+
+　　或者：mvn deploy:deploy-file -Dmaven.test.skip=true -Dfile=D:\workspace\com.xxx.test-1.0.0.jar -DgroupId=com.xxx -DartifactId=test -Dversion=1.0.0-SNAPSHOT -Dpackaging=jar -DrepositoryId=nexus-repository -Durl=http://192.168.xxx.xxx:9090/repository/3rd-part/
+
+
+
+如图build success 代表成功。
+
+四、使用
+复制代码
+ 1 <!-- 远程nexus仓库 -->
+ 2     <repositories>
+ 3         <repository>
+ 4             <id>nexus-snapshots</id>
+ 5             <url>http://47.100.xxx.xxx:30010/repository/3rd-part/</url>
+ 6         </repository>
+ 7         <repository>
+ 8             <id>nexus-repository</id>
+ 9             <url>http://47.100.xxx.xxx:30010/repository/3rd-part/</url>
+10         </repository>
+11     </repositories>
+12     <pluginRepositories>
+13         <pluginRepository>
+14             <id>nexus-snapshots</id>
+15             <url>http://47.100.xxx.xxx:30010/repository/3rd-part/</url>
+16         </pluginRepository>
+17         <pluginRepository> 
+18             <id>nexus-repository</id>
+19             <url>http://47.100.xxx.xxx:30010/repository/3rd-part/</url>
+20         </pluginRepository>
+21     </pluginRepositories>
+复制代码
