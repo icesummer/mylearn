@@ -1,0 +1,20 @@
+version: '3.7'
+services:
+  jenkins:
+    restart: always
+    images: jenkins
+    container_name: jenkins
+    ports: 
+      - 8888: 8080
+      - 50000: 50000
+    volumes:
+      - ./jenkins_home:/var/jenkins_home
+# mkdir jenkins_home
+# chmod 755 jenkins_home/*
+# cd jenkins_home
+# docker-compose up -d && docker-compose logs
+# 第一次运行./data目录没有权限，导致失败：[chmod 755 ./data -- > docker-compose restart]
+# 访问： 127.0.0.1:8888
+# * 输入密码<在logs日志中有初始密码>
+# 登陆后安装插件git，publish
+# docker run -u root  --rm  --name jenkins  -d -p 8080:8080  -p 50000:50000  -v jenkins-data:/var/jenkins_home  -v /var/run/docker.sock:/var/run/docker.sock jenkins

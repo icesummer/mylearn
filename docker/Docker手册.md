@@ -2,6 +2,8 @@
 
 ## 一、基本命令
 
+* win安装docker和docker-compose [教程][https://blog.csdn.net/xiayu204575/article/details/100187557]
+
 ### 1）帮助命令
 
 ```dockerfile
@@ -247,7 +249,7 @@ Dockerfile是用来构建Docker镜像的构建文件，是有一系列命令和�
 
 ### 1）Dockerfile体系结构(保留字指令)
 
-```	less
+```	scss
 FROM 基础镜像，当前镜像是基于哪个镜像
 	FROM scratch # scratch是最基础的镜像
 MAINTAINER 镜像维护者的姓名和邮箱 
@@ -282,8 +284,8 @@ ONBUILD 当构建一个被继承的Dockerfile时运行命令，父镜像在被�
 ### 2）3步骤
 
  1. 创建一个Dockerfile文件，并且指定自定义镜像信息
- ```scss
- Dockerfile中常用的内容
+ ```dockerfile
+ # Dockerfile 中常用的内容
  from 指定当前自定义镜像依赖的环境
  copy 将相对路径下的内容复制到自定义镜像中
  workdir 声明镜像的默认工作目录
@@ -302,7 +304,7 @@ ONBUILD 当构建一个被继承的Dockerfile时运行命令，父镜像在被�
 
 #### 	3.1、编写Dockerfile文件
 
-```sh
+```dockerfile
 FROM centos
 MAINTAINER ice<icesummer_u@qq.com>
 # 把宿主机当前上下文的c.txt拷贝到容器/usr/local/路径下
@@ -364,52 +366,79 @@ source /etc/profile
 
 > 常规方法：安装mysql5.7
 
-```haskell
-docker run -p 3306:3306 --name mysql-57 -v /my/mysql/conf:/etc/mysql/conf -v /my/mysql/logs:/logs - v /my/mysql/data:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=xxx -d centos/mysql-57-centos7
--v /mydata/mysql/conf:/etc/mysql：将配置文件夹挂在到主机
--v /mydata/mysql/log:/var/log/mysql：将日志文件夹挂载到主机
--v /mydata/mysql/data:/var/lib/mysql/：将配置文件夹挂载到主机
+```powershell
+docker run -p 3306:3306 --name mysql-57 - v /my/mysql/data:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=xxx -d centos/mysql-57-centos7
+--------------
+-v /mydata/mysql/conf:/etc/mysql # 将配置文件夹挂在到主机
+-v /mydata/mysql/log:/var/log/mysql # 将日志文件夹挂载到主机
+-v /mydata/mysql/data:/var/lib/mysql # 将配置文件夹挂载到主机
 ----
 mysql/mysql-server
 ```
 
 > 安装mariadb（docker pull mariadb）
 
-```scss
+```sh
 docker run -v /my/mariadb/:/var/lib/mariadb -p 3309:3309 -e MYSQL_ROOT_PASSWORD=xxx --privileged=true --restart unless-stopped --name mariadbs -d mariadb:latest
 ```
 
-#### 	2.1、docker-compose-yml
+#### 	2.1、docker-compose-yml 案例
 
-centos/mysql-57-centos7
+> 维护myql8和tomcat8：
+
+​       1. 首先创建一个外部网络		
+
+```sh
+docker network create myout-network # 创建外部网络
+```
 
 ```yml
-version: '3.1'
-services: 
-  mysql:                      # 服务的名称
+version: '3.7'
+services:
+  mysqldb:                      # 服务的名称
     restart: always           # 总是随容器启动
-    image: daocloud.io/library/mysql:5.7.4 # 镜像的位置 
-    container_name: mysql57   # 容器的名称
+    image: mysql # 镜像的位置 
+    container_name: mysqldb   # 容器的名称
     ports:                    # 映射容器端口
       - 8817:3306
-    environment: 
-      MYSQL_ROOT_PASSWORD: roto-!23    # mysql的root密码
-      TZ: Asia/Shanghai                # 时区
-    volumes: 
+    environment:
+      MYSQL_ROOT_PASSWORD: 'roto-123456'
+      TZ: 'Asia/Shanghai'                # 时区
+    command:
+      --default-authentication-plugin=mysql_native_password
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_general_ci
+      --explicit_defaults_for_timestamp=true
+      --lower_case_table_names=1
+    volumes:
       - /data/web/cloud/docker/mysql/data:/var/lib/mysql  #映射数据卷
-      - /data/web/cloud/docker/mysql/conf:/etc/mysql/conf.d 
-      - /data/web/cloud/docker/mysql/logs:/logs
+      #- /data/web/cloud/docker/mysql/conf:/etc/mysql/conf.d 
+      #- /data/web/cloud/docker/mysql/logs:/logs
+    networks:
+      - default
+      - myout-network
   tocmat:                      # 服务的名称
     restart: always            # 总是随容器启动
     image: dordoka/tomcat      # 镜像的位置
     container_name: tomcat8    # 容器的名称
     ports:                     # 映射容器端口
       - 8816:8080
-    environment: 
+    environment:
       TZ: Asia/Shanghai
     volumes:
-      - /data/web/cloud/docker/tc8/webapps:/usr/local/tomcat/webapps
-      - /data/web/cloud/docker/tc8/logs:/usr/local/tomcat/logs
+      - /data/web/cloud/docker/tc8/webapps:/opt/tomcat/webapps
+      - /data/web/cloud/docker/tc8/logs:/opt/tomcat/logs
+    networks:
+      - default
+networks:
+  myout-network:
+    external: true  # 使用外部网络true
+```
+
+​		2. 后台启动
+
+``` sh
+docker-compose up -d # -d后台启动
 ```
 
 #### 2.2、docker-compose命令管理容器
@@ -417,28 +446,304 @@ services:
 > 使用docker-compose时，默认会在当前命令下找docker-compose.yml文件
 
 ```sh
-mkdir /data/docker//mysql /data/docker/tc8
+mkdir /data/docker/mysql /data/docker/tc8
 #1. 基于docker-compose.yml启动管理容器
 docker-compose up -d # -d后台启动
 #2. 关闭并删除容器
 docker-compose down
 #3. 开启或关闭已经存在的由docker-compose维护的容器
-docker-compose start|stop|restart
+docker-compose start|stop|restart [xx]
 #4. 查看由docker-compose维护的容器
 docker-compose ps
 #5. 查看日志
 docker-compose logs -f 
+#6. 重新构建自定义镜像
+docker-compose build
 ```
 
-#### 2.3、docker-compose配置Dockerfile使用
+### 3）docker-compose配置Dockerfile
 
+> 使用docker-compose.yml文件和Dockerfile在生成自定义镜像的同时启动当前镜像，并且由docker-compose去管理容器
 
+[docker-compose.yml]()
 
-
-
-
-
-
+```yml
+# yml文件
+version: '3.7'
+services:
+  ssm:
+    restart: always    # 总是随容器启动
+    build:             # 构建自定义镜像
+      context: .     # 指定Dockerfile所在路径
+      dockerfile: Dockerfile    # 指定Dockerfile的文件名称
+    image: sms:1.0.1   # 来自Dockerfile的镜像命名
+    container_name: ssm
+    ports:
+      - 8081: 8080
+    environment:
+      TZ: Asia/Shanghai
 ```
 
+[Dockerfile]()
+
+```dockerfile
+#Dockerfile:
+from dordoka/tomcat
+copy ssm.war /opt/tomcat/webapps   # 将本地war包发布到容器中
 ```
+
+```sh
+# 可以直接启动基于docker-compose.yml和Dockerfile构建的自定义镜像
+docker-compose up -d
+# 可以重新构建自定义镜像 
+docker-compose build
+# 运行前，重新构建
+docker-compose up -d --build
+```
+
+---
+
+## 六、Docker CI、CD
+
+> 实现docker自动化部署项目
+
+### 1）部署项目过程的问题
+
+```turtle
+# 发布过程：
+1. 将项目通过maven进行编译打包
+2. 将文件传到指定的服务中
+3. 将war包放到tomcat中
+4. 通过Dockerfile和tomcat和war包转成一个镜像，由docker-compose运行容器
+# 项目更新： 
+	将上述步骤再来一遍？
+缺点：重复，频繁更新会
+解决：CI持续集成，只要修改就
+```
+
+### 2）CI介绍
+
+> CI(continuous intergration) 持续集成
+>
+> 持续集成：编写代码时，完成了一个功能后，立即提交代码到git仓库，CI自动将项目重新构建；
+>
+> * 快速发现错误
+> * 防止代码偏离主分支
+
+###  3）实现持续集成
+
+#### 3.1、搭建gitlab服务器
+
+> 1. 创建一个虚拟机，并至少指定4G的运行内存
+>
+> 2. 安装docker以及docker-compose
+>
+> 3. 将ssh的默认22端口修改为60022
+>
+>    ```sh
+>    # 修改ssh连接端口
+>    vim /etc/ssh/sshd_config
+>    # Port 22 -> Port 60022
+>    systemctl restart sshd
+>    ```
+>
+> 4. 使用docker-compose.yml文件安装gitlab 
+
+[docker-compose.yml]()
+
+```yml
+# cd /data/web/docker_gitlab
+# mkdir /data/web/docker_gitlab
+# vim docker-compose
+version: '3.7'
+services:
+  gitlab:
+    images: 'twang2218/gitlab-ce-zh:11.1.4'
+    container_name: 'gitlab'
+    restart: always
+    privileged: true
+    hostname: 'gitlab'
+    environment:
+      TZ: 'Asia/Shanghai'
+      GITLAB_OMNIBUS_CONFIG: |
+        external_url: 'http://192.168.199.110'
+        gitlab_rails['time_zone']='Asia/Shanghai'
+        gitlab_rails['smtp_enable']=true
+        gitlab_rails['gitlab_shell_ssh_port']=22
+    ports:
+      - '80:80'
+      - '443:443'
+      - '60022:22'
+    volumes:
+      - /data/web/docker_gitlab/config:/etc/gitlab
+      - /data/web/docker_gitlab/data:/var/opt/gitlab
+      - /data/web/docker_gitlab/logs:/var/log/gitlab
+```
+
+```sh
+# docker-compose 启动
+docker-compose up -d && docker-compose logs -f 
+# 访问gitlab
+# http://192.168.199.110:80
+# 并设置密码并登录：root/设置的密码
+# 登录并创建一个testci工程
+```
+
+#### 3.2、GitLab-Runner
+
+![image-20201102144837609](C:\Users\sum\AppData\Roaming\Typora\typora-user-images\image-20201102144837609.png)
+
+---
+
+![image-20201102145525310](C:\Users\sum\AppData\Roaming\Typora\typora-user-images\image-20201102145525310.png)
+
+---
+
+
+
+![image-20201102145602109](C:\Users\sum\AppData\Roaming\Typora\typora-user-images\image-20201102145602109.png)
+
+![image-20201102145645854](C:\Users\sum\AppData\Roaming\Typora\typora-user-images\image-20201102145645854.png)
+
+^[上述过程将runner与gitlab的testci工程结合了起来]
+
+- 测试
+
+> 1. 创建maven工程，添加web.xml文件，编写html
+>
+> 2. 编写gitlab-ci.yml文件（在工程目录）
+>
+>    ```
+>    stages:
+>      - test
+>    test:
+>      statge: test
+>      script:
+>        - echo first test ci # 输入的命令
+>        - /usr/local/maven/apache-maven-3.6.3/bin/mvn package
+>    ```
+>
+> 3. 将maven工程推送到gitlab中testci
+> 4. 可以再gitlab看到gitlab-cli.yml的内容
+
+![image-20201102150608795](C:\Users\sum\AppData\Roaming\Typora\typora-user-images\image-20201102150608795.png)
+
+
+
+### 4）CICD介绍
+
+> CI   -->   开发人员------> 提交到gitlab------->gitlab-runner自动部署到测试环境 >-->[称之为(持续集成)]
+>
+> CD -->   将开发环境CI到-- > 测试环境---->生产环境
+>
+> ``` 
+> * 持续交付：将代码交付给专业的测试团队去测试
+> * 持续部署：将测试通过的代码，发布到生产环境
+> ```
+
+![image-20201102155655416](C:\Users\sum\AppData\Roaming\Typora\typora-user-images\image-20201102155655416.png)
+
+### 5）CICD_JenKins
+
+> [教学视频][https://www.bilibili.com/video/BV1sK4y1s7Cj?p=24]
+
+#### 5.1 安装Jenkins
+
+> 官网：genkins.io/zh/            doc： https://www.jenkins.io/zh/doc/book/installing/
+>
+> 推荐配置： * 1GB+可用内存   * 50GB+可用磁盘空间
+>
+> ```sh
+> # linux：
+> docker pull jenkinsci/blueocean
+> docker run \
+>   -u root \
+>   --rm \  # （可选） jenkinsci/blueocean 关闭时自动删除Docker容器（下图为实例）。如果您需要退出Jenkins，这可以保持整洁。
+>   --name jenkins-blueocean \
+>   -d \ 
+>   -p 8080:8080 \ 
+>   -p 50000:50000 \ 
+>   -v jenkins-data:/var/jenkins_home \ 
+>   -v /var/run/docker.sock:/var/run/docker.sock \ 
+>   jenkinsci/blueocean 
+> ```
+>
+> ---
+>
+> ```sh
+> # windows：
+>   docker run -u root  --rm  --name jenkins  -d -p 8080:8080  -p 50000:50000  -v jenkins-data:/var/jenkins_home  -v /var/run/docker.sock:/var/run/docker.sock jenkins
+> ```
+>
+> [docker-compose.yml]()
+>
+> ```yml
+> # mkdir jenkins_home
+> # chmod 755 jenkins_home/*
+> # cd jenkins_home
+> version: '3.7'
+> services:
+>   jenkins:
+>     images: jenkinsci/blueocean
+>     restart: always
+>     container_name: jenkins
+>     ports: 
+>       - 8888: 8080
+>       - 50000: 50000
+>     volumes:
+>       - ./data:/var/jenkins_home
+> 
+> # docker-compose up -d & docker-compose logs
+> # 第一次运行./data目录没有权限，导致失败：[chmod 755 ./data -- > docker-compose restart]
+> # 访问： 127.0.0.1:8888
+> # * 输入密码<在logs日志中有初始密码>
+> # 登陆后安装插件git，publish
+> ```
+>
+> ![image-20201102163023156](C:\Users\sum\AppData\Roaming\Typora\typora-user-images\image-20201102163023156.png)
+
+#### 5.2、配置目标服务器及Gitlab免密码登录
+
+> Gitlab -> Jenkins -> 目标服务器
+>
+> ```
+> 1. Jenkins去连接目标服务器
+> 	打开gitlab网址[http:///:8888/manage] ->Manage Jenkins->Configure System
+> 	-> Publish over SSH ->add SSH Server
+> 	->   * name: jenkins-193.15555  * hostname: 193.155x?? username:root Remote Dir:/usr/xxx
+> 2. 
+> ```
+>
+> ![image-20201102173939109](C:\Users\sum\AppData\Roaming\Typora\typora-user-images\image-20201102173939109.png)
+
+#### 5.3 Jenkins配置Gitlab免密码登录
+
+```
+1. 登录Jenkins容器内部
+2. 输入生成SSH密钥的命令
+3. 复制到gitlab的ssh中
+```
+
+![image-20201102174244260](C:\Users\sum\AppData\Roaming\Typora\typora-user-images\image-20201102174244260.png)
+
+> 上个目录对应该主机数据卷地址：./data/下的.ssh 可以拿到密钥
+>
+> ```sh
+> cd .ssh ;cat id_rsa.pub 复制到gitlab网页中的settings->ssh密钥
+> ```
+
+#### 5.4  配置jdk和Maven
+
+```
+1. 复制本地jdk和maven的压缩包到jenkins-data目录	,手动解压 
+2. 在jenkins监控页面配置jdk和maven<位置：settings->Manage Jenkins ->Global Tool Configuration ->1.Add Jdk(JAVA_HOME);2.Add Maven(MAVEN_HOME)
+```
+
+#### 5.5 Jenkins(真实学不动了)
+
+> [后续课程][https://www.bilibili.com/video/BV1sK4y1s7Cj?p=25]
+
+## END
+
+***
+
