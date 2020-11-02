@@ -241,7 +241,11 @@ docker run -it -v D:/work/test/zhuji:/data/volume/container:ro centos
 
   [^注]: Dockerfile只是容器内部的数据卷映射，不支持宿主机和容器的数据卷映射
 
+  ![image-20201030120115392](https://github.com/icesummer/mylearn/raw/master/docker/typora-user-images/image-20201030120115398.png)
+  
   ![image-20201030120115398](typora-user-images/image-20201030120115398.png)
+  
+  
 
 ## 四、Dockerfile
 
@@ -741,7 +745,9 @@ docker-compose up -d && docker-compose logs -f
 
 #### 5.5 Jenkins(真实学不动了)
 
-> [后续课程][https://www.bilibili.com/video/BV1sK4y1s7Cj?p=25]
+> [后续课程][https://www.bilibili.com/video/BV1sK4y1s7Cj?p=25?]
+>
+> <a href="https://www.bilibili.com/video/BV1sK4y1s7Cj?p=25" target="_blank">后续课程</a>
 
 ## END
 
