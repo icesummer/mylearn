@@ -241,7 +241,7 @@ docker run -it -v D:/work/test/zhuji:/data/volume/container:ro centos
 
   [^注]: Dockerfile只是容器内部的数据卷映射，不支持宿主机和容器的数据卷映射
 
-  ![image-20201030120115398](C:\Users\sum\AppData\Roaming\Typora\typora-user-images\image-20201030120115398.png)
+  ![image-20201030120115398](typora-user-images/image-20201030120115398.png)
 
 ## 四、Dockerfile
 
@@ -591,19 +591,19 @@ docker-compose up -d && docker-compose logs -f
 
 #### 3.2、GitLab-Runner
 
-![image-20201102144837609](C:\Users\sum\AppData\Roaming\Typora\typora-user-images\image-20201102144837609.png)
+![image-20201102144837609](typora-user-images/image-20201102144837609.png)
 
 ---
 
-![image-20201102145525310](C:\Users\sum\AppData\Roaming\Typora\typora-user-images\image-20201102145525310.png)
+![image-20201102145525310](typora-user-images/image-20201102145525310.png)
 
 ---
 
 
 
-![image-20201102145602109](C:\Users\sum\AppData\Roaming\Typora\typora-user-images\image-20201102145602109.png)
+![image-20201102145602109](typora-user-images/image-20201102145602109.png)
 
-![image-20201102145645854](C:\Users\sum\AppData\Roaming\Typora\typora-user-images\image-20201102145645854.png)
+![image-20201102145645854](typora-user-images/image-20201102145645854.png)
 
 ^[上述过程将runner与gitlab的testci工程结合了起来]
 
@@ -626,7 +626,7 @@ docker-compose up -d && docker-compose logs -f
 > 3. 将maven工程推送到gitlab中testci
 > 4. 可以再gitlab看到gitlab-cli.yml的内容
 
-![image-20201102150608795](C:\Users\sum\AppData\Roaming\Typora\typora-user-images\image-20201102150608795.png)
+![image-20201102150608795](typora-user-images/image-20201102150608795.png)
 
 
 
@@ -641,7 +641,7 @@ docker-compose up -d && docker-compose logs -f
 > * 持续部署：将测试通过的代码，发布到生产环境
 > ```
 
-![image-20201102155655416](C:\Users\sum\AppData\Roaming\Typora\typora-user-images\image-20201102155655416.png)
+![image-20201102155655416](typora-user-images/image-20201102155655416.png)
 
 ### 5）CICD_JenKins
 
@@ -700,7 +700,7 @@ docker-compose up -d && docker-compose logs -f
 > # 登陆后安装插件git，publish
 > ```
 >
-> ![image-20201102163023156](C:\Users\sum\AppData\Roaming\Typora\typora-user-images\image-20201102163023156.png)
+> ![image-20201102163023156](typora-user-images/image-20201102163023156.png)
 
 #### 5.2、配置目标服务器及Gitlab免密码登录
 
@@ -714,7 +714,7 @@ docker-compose up -d && docker-compose logs -f
 > 2. 
 > ```
 >
-> ![image-20201102173939109](C:\Users\sum\AppData\Roaming\Typora\typora-user-images\image-20201102173939109.png)
+> ![image-20201102173939109](typora-user-images\image-20201102173939109.png)
 
 #### 5.3 Jenkins配置Gitlab免密码登录
 
@@ -724,7 +724,7 @@ docker-compose up -d && docker-compose logs -f
 3. 复制到gitlab的ssh中
 ```
 
-![image-20201102174244260](C:\Users\sum\AppData\Roaming\Typora\typora-user-images\image-20201102174244260.png)
+![image-20201102174244260](typora-user-images\image-20201102174244260.png)
 
 > 上个目录对应该主机数据卷地址：./data/下的.ssh 可以拿到密钥
 >
