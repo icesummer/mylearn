@@ -1,3 +1,5 @@
+
+
 # Kubernetes
 
 ## 一、介绍
@@ -211,7 +213,7 @@ ntpdate time.windows.com
 > # kubeadm 以后将会在 /etc 路径下生成配置文件和证书文件
 > ```
 >
-> ![image-20201103165555161.png](typora-k8s-images\image-20201103165555161.png)
+> ![image-20201103165555161.png](typora-k8s-images/image-20201103165555161.png)
 >
 > -  由于默认拉取镜像的地址是k8s.gcr.io，这里指定阿里云镜像仓库地址，使用kuberctl工具：本地化
 >
@@ -271,3 +273,18 @@ $ kubectl get pod.svc
 
 - [参考网址](https://www.cnblogs.com/zgqbky/p/12149753.html)
 
+```flow
+st=>start: 开始
+e=>end: 登录
+io1=>inputoutput: 输入用户名密码
+sub1=>subroutine: 数据库查询子类
+cond=>condition: 是否有此用户
+cond2=>condition: 密码是否正确
+op=>operation: 读入用户信息
+
+st->io1->sub1->cond
+cond(yes,right)->cond2
+cond(no)->io1(right)
+cond2(yes,right)->op->e
+cond2(no)->io1
+```
