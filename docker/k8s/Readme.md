@@ -1,6 +1,6 @@
-
-
 # Kubernetes
+
+-----
 
 ## 一、介绍
 
@@ -33,9 +33,9 @@ K8S优势
 
 ## 二、K8S入门
 
-### 1）四组基本概念
+### 2.1 四组基本概念
 
-#### 1.1、Pod/Pod控制器
+#### 2.1.1、Pod/Pod控制器
 
 ```shell
 # Pod: k8s最小的部署单元，一个Pod是一组容器的集合，其中的容器共享网络，生命周期短暂
@@ -45,15 +45,15 @@ K8S优势
 # 通过Service统一入口访问--> 由Controller创建Pod进行部署
 ```
 
-#### 1.2、Name/Namespace
+#### 2.1.2、Name/Namespace
 
-#### 1.3、Label/Label选择器
+#### 2.1.3、Label/Label选择器
 
-#### 1.4、Service/Ingress
+#### 2.1.4、Service/Ingress
 
-### 2）搭建K8S集群
+## 三、搭建K8S集群
 
-####   2.1 搭建k8s环境平台规划
+###   3.1 搭建k8s环境平台规划
 
 ```sh
 # Master 调度整个集群
@@ -76,7 +76,7 @@ graph LR
 	printC[master] -.-> 1[负载均衡]  -.->C[node2]
 ```
 
-#### 2.2 服务器硬件要求
+### 3.2 服务器硬件要求
 
 ```shell
 # 硬件要求：
@@ -90,7 +90,7 @@ graph LR
 
 
 
-#### 2.3 k8s集群部署方式
+### 3.3 k8s集群部署方式
 
 
 ```shell
@@ -99,7 +99,7 @@ graph LR
 # 方式3：（二进制包）## 前两者是自动化，这种是手动部署，适用于大型生产环境
 ```
 
-#### 2.4 k8s集群部署方式-kubeadm方式
+### 3.4 k8s集群部署方式-kubeadm方式
 ``` shell
 # 大概目标步骤
 # 1. 创建一个Master节点：
@@ -107,7 +107,7 @@ graph LR
 # 2. 将Node节点加入到当前集群中 
 	$ kubeadm join <Master节点的IP和端口>
 ```
-##### 1）安装要求
+#### 3.4.1 安装要求
 
 ```sh
 # 1 一台或多台机器Centos7.x；
@@ -123,11 +123,11 @@ graph LR
 # 2 部署Kubernetes Master
 ```
 
-##### 2）安装过程
+#### 3.4.2 安装过程
 
-###### 1、安装3个虚拟机和安装操作系统centos7.x；
+##### 1）安装3个虚拟机和安装操作系统centos7.x；
 
-###### 2、将所有操作系统初始化
+##### 2） 将所有操作系统初始化
 
 ```shell
 # 1. 关闭防火墙
@@ -158,7 +158,7 @@ yum install ntpdate -y
 ntpdate time.windows.com
 ```
 
-###### 3、所有节点安装Docker，kubeadm、kubelet
+##### 3） 所有节点安装Docker，kubeadm、kubelet
 
 - kubernets默认CRI(容器运行时)是Docker，先安装Docker
 
@@ -199,7 +199,7 @@ ntpdate time.windows.com
 
 ---
 
-###### 4、部署Kubernetes Master
+##### 4） 部署Kubernetes Master
 
 （在192.168.100.120 k8s-master执行kubeadm init）
 
@@ -227,7 +227,7 @@ ntpdate time.windows.com
 >   # 加入节点：（复制上图第2处红线(包含其上一行)完整命令在Node节点执行）
 >   ```
 
-###### 5、加入Kubernetes Node 
+##### 5）加入Kubernetes Node 
 > * kubeadm join将Node节点加入Master
 >
 > ```shell
@@ -243,7 +243,7 @@ ntpdate time.windows.com
 > kubeadm token create --print-join-command 
 > ```
 
-###### 6、安装Pod网络插件（CNI）
+##### 6） 安装Pod网络插件（CNI）
 > ```shell
 > # <master节点操作>
 > # $ wget https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
@@ -254,7 +254,7 @@ ntpdate time.windows.com
 > $ kubectl get nodes
 > ```
 
-###### 7、测试Kubernetes集群
+##### 7） 测试Kubernetes集群
 
 ```shell
 # kubectl get pod # 查看Pod，目前啥也没有
@@ -265,13 +265,17 @@ $ kubectl get pod.svc
 # .访问地址： http://NodeIp:Port；# eg:http://192.168.100.121:32753 # <32753是node1的nginx端口>
 ```
 
-#### 2.5 k8s集群部署方式-二进制方式
+### 3.5 k8s集群部署方式-二进制方式
 
-##### 1）安装要求 同kubeadm
+#### 3.51 安装要求 同kubeadm
 
-##### 2）安装参考
+#### 3.52 安装参考
+
+**end.**
 
 - [参考网址](https://www.cnblogs.com/zgqbky/p/12149753.html)
+
+---
 
 ```flow
 st=>start: 开始
@@ -288,3 +292,11 @@ cond(no)->io1(right)
 cond2(yes,right)->op->e
 cond2(no)->io1
 ```
+---
+
+![ad](https://f12.baidu.com/it/u1=3071667422&u2=3518914040&fm=76)
+
+
+
+![alt] (URL title)
+
