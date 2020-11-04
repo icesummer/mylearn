@@ -6,7 +6,7 @@
 
 ### 1）帮助命令
 
-```dockerfile
+```sh
 docker -- help 
 docker version
 docker info
@@ -18,32 +18,32 @@ http://hub.daocloud.io/
 
 #### 1.2.1 查看本地镜像 
 
-```linux
+```shell
 docker images [-aq] [--digests] [--no-trunc ]
-		-a 全部镜像
-		-q 只显示镜像ID
-		--digests 镜像的摘要写信息
-		--no-trunc 镜像的完整信息
+		-a # 全部镜像
+		-q # 只显示镜像ID
+		--digests # 镜像的摘要写信息
+		--no-trunc # 镜像的完整信息
 ```
 
 #### 1.2.2 搜索镜像
 
-```linux
-docker search [image name]
-eg 搜索不低于3星的python：
+```sh
+## docker search [image name]
+# eg 搜索不低于3星的python：
 docker search --filter=stars=3 python
 ```
 
 #### 1.2.3 下载镜像
-```
-docker pull [image name]
-eg 下载最新python：
+```shell
+## docker pull [image name]
+# eg 下载最新python：
 docker pull python 或 docker pull python:latest 
 ```
 
 #### 1.2.4 删除镜像
-```
-dockers rmi [-f] [image id|name]
+```shell
+## dockers rmi [-f] [image id|name]
 # 删除单个：
 docker rmi -f 镜像ID
 # 删除多个：
@@ -51,7 +51,6 @@ docker rmi -f 镜像名1:tag 镜像名2:tag
 # 删除全部：
 docker rmi -f $(docker images -qa)
 
-eg: 
 ```
 
 ### 3）docker 容器命令 
@@ -110,23 +109,23 @@ docker ps [OPTIONS]
 #### 1.3.6  删除已停止容器
 
 ```shell
-docker rm [-f] [containerID]  删除某容器,不加-f只能删已停止的
+docker rm [-f] [containerID]  # 删除某容器,不加-f只能删已停止的
 ```
 * 一次行删除多个容器:
 
 ```shell
-docker rm -f $(docker ps -a -q) 删除所有容器
-docker rm -f $(docker ps -a |grep Exited) 删除不运行的容器
-docker ps -a -q|xargs docker rm 同1
+docker rm -f $(docker ps -a -q) # 删除所有容器
+docker rm -f $(docker ps -a |grep Exited) # 删除不运行的容器
+docker ps -a -q|xargs docker rm # 同1
 ```
 
 #### 1.3.7  查看容器日志
 
-```less
-docker logs -f -t --tail 容器ID
-    -t是加入时间戳
-    -f是跟随最新的日志打印
-    --tail [n] 显示最后n条
+```shell
+docker logs -f -t --tail [容器ID]
+    -t # 是加入时间戳
+    -f # 是跟随最新的日志打印
+    --tail [n] # 显示最后n条
 ```
 #### 1.3.8   查看容器内运行的进程
 
@@ -139,12 +138,12 @@ docker logs -f -t --tail 容器ID
 #### 1.3.10  进入正在运行的容器并以命令交互
 
 * docker exec -it 容器ID [执行的命令]
-  ```less
+  ```shell
   docker exec -it 容器ID [执行的命令]
   1. docker exec -it xxx /bin/bash
-  	跟attach一样进入了容器shell终端
+  	# 跟attach一样进入了容器shell终端
   2. docker exec -it xxx ls -l /tmp
-  	直接返回了tmp下的文件列表并退出容器 
+  	# 直接返回了tmp下的文件列表并退出容器 
   3. docker exec -it a49fe28c4109 /bin/bash 重进tomcat操作部署文件
   ```
 * docker attach [容器ID]
@@ -154,7 +153,7 @@ docker logs -f -t --tail 容器ID
 
 ```turtle
 docker cp 容器ID:/tmp/a.txt /root
-将容器ID中的a.txt拷贝到本机/root下
+# 将容器ID中的a.txt拷贝到本机/root下
 ```
 
 ## 二、自定义本地镜像
@@ -745,9 +744,9 @@ docker-compose up -d && docker-compose logs -f
 
 #### 5.5 Jenkins(真实学不动了)
 
-> [后续课程][https://www.bilibili.com/video/BV1sK4y1s7Cj?p=25?]
->
-> <a href="https://www.bilibili.com/video/BV1sK4y1s7Cj?p=25" target="_blank">后续课程</a>
+* [后续课程][https://www.bilibili.com/video/BV1sK4y1s7Cj?p=25?]
+
+* <a href="https://www.bilibili.com/video/BV1sK4y1s7Cj?p=25" target="_blank">后续课程</a>
 
 ## END
 
