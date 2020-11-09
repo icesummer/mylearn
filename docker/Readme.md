@@ -400,7 +400,7 @@ docker network list # 查看已存在的网络
 version: '3.7'
 services:
   mysqldb:                      # 服务的名称
-    restart: always           # 总是随容器启动
+    restart: always           # 总是随容器启动；unless-stopped:当正常退出时，下次不在随docker启动，其它同always
     image: mysql # 镜像的位置 
     container_name: mysqldb   # 容器的名称
     ports:                    # 映射容器端口
@@ -674,6 +674,10 @@ mvn deploy:deploy-file
 >    vim /etc/ssh/sshd_config
 >    # Port 22 -> Port 60022
 >    systemctl restart sshd
+>    # 安装Ruby环境(gitlab是Ruby on Rains写的)
+>    # 官方镜像 store/gitlab/gitlab-ce:11.10.4-ce.0
+>    # 中文镜像 twang2218/gitlab-ce-zh:11.1.4'
+>    # https://hub.docker.com/r/twang2218/gitlab-ce-zh
 >    ```
 >
 > 4. 使用docker-compose.yml文件安装gitlab 
@@ -719,7 +723,7 @@ docker-compose up -d && docker-compose logs -f
 # 登录并创建一个testci工程
 ```
 
-#### 3.2、GitLab-Runner
+#### 3.2、GitLab-Runner 
 
 ![image-20201102144837609](typora-user-images/image-20201102144837609.png)
 
@@ -757,6 +761,8 @@ docker-compose up -d && docker-compose logs -f
 > 4. 可以再gitlab看到gitlab-cli.yml的内容
 
 ![image-20201102150608795](typora-user-images/image-20201102150608795.png)
+
+[^运行命令：]: docker run --rm -t -id -v ~/data/gitlab-runner/config:/etc/gitlab-runner gitlab/gitlab-runner:v12.6.0
 
 
 
