@@ -1,0 +1,11 @@
+{
+  "registry-mirrors": [
+    "https://kc3mq41k.mirror.aliyuncs.com"
+  ],
+  "insecure-registries": [],
+  "debug": false,
+  "experimental": false,
+  "features": {
+    "buildkit": true
+  }
+}

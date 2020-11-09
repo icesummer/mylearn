@@ -16,7 +16,7 @@ services:
       --explicit_defaults_for_timestamp=true
       --lower_case_table_names=1
     volumes:
-      - D:/work/data/docker/mysql/data:/var/lib/mysql  #映射数据卷
+      - ./mysql/data:/var/lib/mysql  #映射数据卷
       #- /data/web/cloud/docker/mysql/conf:/etc/mysql/conf.d 
       #- /data/web/cloud/docker/mysql/logs:/logs
     networks:
@@ -31,8 +31,8 @@ services:
     environment:
       TZ: Asia/Shanghai
     volumes:
-      - D:/work/data/docker/tc8/webapps:/opt/tomcat/webapps
-      - D:/work/data/docker/tc8/logs:/opt/tomcat/logs
+      - D:./webapps:/opt/tomcat/webapps
+      - D:./logs:/opt/tomcat/logs
     networks:
       - default
 networks:

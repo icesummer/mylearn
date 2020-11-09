@@ -1,0 +1,41 @@
+﻿SSI服务端包含技术
+    将页面分成一个一个小页面，通过cms管理这些页面，
+    当要更改部分页面内容时只需要更改具体的某个小页面
+使用web服务(如nginx)的SSI技术，将多个子页面合并渲染
+
+SSI：Server Side Include（）
+原理：将内容发送到浏览器之前，可以使用SSI指令将文本，图像
+或应用程序信息包含到网页中，语法eg：
+<!-- #include virtual="/../.../页面地址.html" -->
+
+将首页拆分：
+index.html 主体内容
+include/header.html  头部内容
+include/index_banner.html 轮播图
+include/index_category.html 左侧导航
+include/footer.html 页尾
+
+在NGINX中开启SSI
+http{
+    server{
+        ssi on;   开启ssi支持
+        ssi_silent_errors on;  on 表示在处理ssi文件出错时不输出错误信息，默认off
+        ssi_types ssi_types text/html(默认);  如果需要支持shtml(服务器执行脚本jsp等)
+            需要设置为ssi_types text/shtml
+    }
+}
+
+页面管理流程
+创建站点
+创建模板
+创建页面
+页面预览
+页面发布
+
+CMS服务端工程开发
+
+MongoDb客户端工具Studio3T
+
+
+
+

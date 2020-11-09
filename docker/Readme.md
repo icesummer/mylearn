@@ -385,14 +385,15 @@ mysql/mysql-server
 docker run -v /my/mariadb/:/var/lib/mariadb -p 3309:3309 -e MYSQL_ROOT_PASSWORD=xxx --privileged=true --restart unless-stopped --name mariadbs -d mariadb:latest
 ```
 
-#### 	2.1、docker-compose-yml 案例
+#### 	2.1、docker-compose-yml 编辑
 
 > 维护myql8和tomcat8：
 
-​       1. 首先创建一个外部网络		
+#####        1. 首先创建一个外部网络		
 
 ```sh
-docker network create myout-network # 创建外部网络
+docker network create myout-network # 创建外部网络 # 统一使用该网络容器间可以用服务名代替ip访问
+docker network list # 查看已存在的网络
 ```
 
 ```yml
@@ -464,7 +465,7 @@ docker-compose logs -f
 docker-compose build
 ```
 
-### 3）docker-compose配置Dockerfile
+### 3）docker-compose配合Dockerfile
 
 > 使用docker-compose.yml文件和Dockerfile在生成自定义镜像的同时启动当前镜像，并且由docker-compose去管理容器
 
@@ -504,11 +505,136 @@ docker-compose build
 docker-compose up -d --build
 ```
 
----
+### 4）容器间的网络通信 - Network设置
 
-## 六、Docker CI、CD
+#### 4.1 同宿主机下 容器间如何互相通信
 
-> 实现docker自动化部署项目
+* 默认compose会为每个容器创建一个默认网络便于容器和宿主的通信(名称：{project_name}_default)，相当于式不同的局域网
+* 容器间无法直接通信(只能把端口通过暴露到宿主机，然后通过宿主ip+外端口访问)
+* 解决：不同容器统一使用相同的外部局域网实现容器间的通信；
+* 需求：1. Mysql处于安全考虑不开放端口，2. Mysql也不支持Tomcat直接用IP形式的连接 
+
+> 解方：
+> 1、先创建外部网络，在不同容器中都使用该网络；
+> 2、docker-compose都统一使用该网络
+> 3、tomcat程序的数据库连接IP使用容器服务名代替：
+
+```yaml
+# 1. 创建一个外部局域网
+docker network create myout-network # 创建外部网络 # 统一使用该网络容器间可以用服务名代替ip访问
+docker network list # 查看已存在的网络
+ 
+# 2. mysql 不expose端口 的docker-compose.yml
+version: '3.7'
+services:
+  mysql_db:
+    image: mysql
+    restart: always
+    container_name: 'mysql_db'
+    # ports: 屏蔽掉暴露端口
+    environment:
+      MYSQL_ROOT_PASSWORD: 'roto-123456'
+      TZ: 'Asia/Shanghai'                # 时区
+    command:
+      --default-authentication-plugin=mysql_native_password
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_general_ci
+      --explicit_defaults_for_timestamp=true
+      --lower_case_table_names=1
+    volumes:
+      - /data/web/cloud/docker/mysql/data:/var/lib/mysql  #映射数据卷
+networks:
+  default: # 默认网络
+    external: # 外部网络
+      name: myout-network # 把该局域网声明为默认网络
+
+# 3. ssm的程序使用该局域网 docker-compose.yml:
+version: '3.7'
+services:
+  ssm:
+    networks:
+      - myout-network # 下方声明的网络非默认,需要显式配置
+    volumes:
+      - ./webapps:/opt/tomcat/webapps
+      - ./logs:/opt/tomcat/logs
+    ... # 其它配置
+networks:
+  myout-network:
+    external: true  # 生命使用该网络作为外部网络 
+    
+# 4. 修改ssm连接数据库的
+   ## application-db.yml: # 使用服务名mysql_db代替IP
+   jdbc:mysql://mysql_db:3306/myshop?useUnicode=true&...
+# 5. 启动 docker-compose up -d
+```
+
+#### 4.2 终极问题：不同宿主机下，怎么实现容器间网络通信
+
+- 使用K8s解决 
+
+
+
+### 5）docker-compose搭建Nexus
+
+* 搭建Maven私服Nexus   ： docker-compose.yml
+* [docker-compse搭建Nexus.md](./mynexus/docker-compose-Nexus.md "docker-compse搭建Nexu")
+
+```yml
+version: '3.7'
+services:
+  nexus:
+    image: 'sonatype/nexus3'
+    container_name: 'nexus'
+    ports:
+      - 8081:8081
+    volumes:
+      - ./data:/nexus-data
+# 给./data赋予读写权限
+# 登录http://ip:port/nexus  # 默认账户admin,密码在/nexus-data/admin.password on the server.
+
+# Pom配置私服地址：
+## 1.配置代理仓库：<repositories> 详略
+## 2. 配置代理仓库插件 <pluginRepositories> 祥略
+## 如上就可以从私服拉取依赖，（过程：pom文件先从私服仓库下载，如果没有再仓中央仓库拉取）
+### 执行命令 mvn clean package -Dmaven.test.skip=true即可拉取依赖
+
+# 发布jar到私服
+## 1. 在本地maven的settings中配置Server节点(发行版和快照版)
+<server><id>nexus=releases</id><username>admin</username><password><admin123</password></server>
+<server><id>nexus-snapshots</id><username>admin</username><password><admin123</password></server>
+## 2. 在项目pom中配置<distributionManagment>
+<repository><id>nexus-release</id><name>x</name><url>http://ip:8081/repository/maven-release/</url></repository>
+<snapshotRepository><id>nexus-snapshots</id><name>x</name><url>http://ip:8081/repository/maven-release/</url></snapshotRepository>
+# 执行命令： mvn deploy -Dmaven.test.skip=true     # (install and upload)
+
+# 手动上传第三方依赖(Nexus3.1+支持) 或者pom下执行如下：
+# 如第三方jar包 aliyun-sdk-oss-2.2.3.jar
+mvn deploy:deploy-file
+    -DgroupId=com.aliyun.oss
+    -DartifactId=aliyun-sdk-oss
+    -Dversion=2.2.3
+    -Dpackaging=jar
+    -Dfile=D:\jar\aliyun-sdk-oss-2.2.3.jar
+    -Drepository=nexus-releases
+```
+
+
+
+***
+
+## 六、搭建Docker私服 Harbor
+
+- 上传本地镜像到私服
+- 标记镜像：docker tag nginx tagname[eg:192.168.xx/myshop/nginx:latest]
+- 登录Harbor：docker login [ip] -u admin -p pwd
+- 推送镜像到Harbor： docker push tagname
+- 从私服下载：docker pull tagname
+
+[asd ](./daemon.json.txt)
+
+## 七、Docker CI、CD
+
+> 实现docker自动化部署项目，一次构建到处执行
 
 ### 1）部署项目过程的问题
 
@@ -520,7 +646,7 @@ docker-compose up -d --build
 4. 通过Dockerfile和tomcat和war包转成一个镜像，由docker-compose运行容器
 # 项目更新： 
 	将上述步骤再来一遍？
-缺点：重复，频繁更新会
+缺点：重复，频繁更新耗时
 解决：CI持续集成，只要修改就
 ```
 
@@ -565,22 +691,23 @@ services:
     container_name: 'gitlab'
     restart: always
     privileged: true
-    hostname: 'gitlab'
+    hostname: 'gitlab' 
     environment:
       TZ: 'Asia/Shanghai'
       GITLAB_OMNIBUS_CONFIG: |
-        external_url: 'http://192.168.199.110'
+        external_url: 'http://192.168.199.110'   # 访问地址
         gitlab_rails['time_zone']='Asia/Shanghai'
         gitlab_rails['smtp_enable']=true
-        gitlab_rails['gitlab_shell_ssh_port']=22
+        gitlab_rails['gitlab_shell_ssh_port']=60022
+        gitlab_rails['listen_port']=80 
     ports:
       - '80:80'
       - '443:443'
       - '60022:22'
     volumes:
-      - /data/web/docker_gitlab/config:/etc/gitlab
-      - /data/web/docker_gitlab/data:/var/opt/gitlab
-      - /data/web/docker_gitlab/logs:/var/log/gitlab
+      - ./config:/etc/gitlab
+      - ./data:/var/opt/gitlab
+      - ./logs:/var/log/gitlab
 ```
 
 ```sh
