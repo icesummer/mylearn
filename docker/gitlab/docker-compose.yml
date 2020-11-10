@@ -1,0 +1,36 @@
+version '3.7'
+services: 
+  gitlab: 
+    image: 'twang2218/gitlab-ce-zh:11.1.4'
+    restart: unless-stopped
+    hostname: 'ctos.javazz.com'
+    privileged: true
+    environment:
+      TZ: 'Asia/Shanghai'
+      GITLAB_OMNIBUS_CONFIG: |  ## Gitlab专有配置
+          external_url 'http://ctos.javazz.com:9082'
+          gitlab_rails['time_zone'] = 'Asia/Shanghai'
+          gitlab_rails['gitlab_shell_ssh_port']=60022
+          nginx['listen_port']= 80
+          # 需要配置到 gitlab.rb 中的配置可以在这里配置，每个配置一行，注意缩进。
+          # 比如下面的电子邮件的配置：
+          # gitlab_rails['smtp_enable'] = true
+          # gitlab_rails['smtp_address'] = "smtp.exmail.qq.com"
+          # gitlab_rails['smtp_port'] = 465
+          # gitlab_rails['smtp_user_name'] = "xxxx@xx.com"
+          # gitlab_rails['smtp_password'] = "password"
+          # gitlab_rails['smtp_authentication'] = "login"
+          # gitlab_rails['smtp_enable_starttls_auto'] = true
+          # gitlab_rails['smtp_tls'] = true
+          # gitlab_rails['gitlab_email_from'] = 'xxxx@xx.com'
+    ports:
+        - '9082:80'
+        - '9443:443'
+        - '60022:22'
+    volumes:
+        - ./config:/etc/gitlab
+        - ./data:/var/opt/gitlab
+        - ./logs:/var/log/gitlab
+# 登录http://ctos.javazz.com:9082 设置初始化密码 12345678
+
+# 新建项目，即可使用

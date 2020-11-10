@@ -1,5 +1,10 @@
 # 												Docker手册
 
+[TOC]
+
+
+
+
 ## 一、基本命令
 
 * win安装docker和docker-compose [教程][https://blog.csdn.net/xiayu204575/article/details/100187557]
@@ -201,7 +206,7 @@ docker run -it -p 8081:8080 myweb/tomcat8.5:1.2
      
    * 容器间继承共享数据
 
-#### 1.1  数据卷特点
+#### 3.1.1  数据卷特点
 
 1. 容器之间共享数据
 2. 卷中的更改可以直接生效
@@ -210,7 +215,7 @@ docker run -it -p 8081:8080 myweb/tomcat8.5:1.2
 
 ### 2）向容器添加数据卷
 
-#### 2.1 直接命令添加
+#### 3.2.1 直接命令添加
 
 命令：
 
@@ -228,7 +233,7 @@ eg: 2、但容器下权限时readonly操作，增加ro：
 docker run -it -v D:/work/test/zhuji:/data/volume/container:ro centos
 ```
 
-#### 2.2 DockerFile添加
+#### 3.2.2 DockerFile添加
 
 
 
@@ -365,7 +370,7 @@ export $PATH:/data/installs/docker-compose
 source /etc/profile
 ```
 
-### 2）管理Mysql和Tomcat容器
+### 2）案例：管理Mysql和Tomcat容器
 
 > 常规方法：安装mysql5.7
 
@@ -385,16 +390,18 @@ mysql/mysql-server
 docker run -v /my/mariadb/:/var/lib/mariadb -p 3309:3309 -e MYSQL_ROOT_PASSWORD=xxx --privileged=true --restart unless-stopped --name mariadbs -d mariadb:latest
 ```
 
-#### 	2.1、docker-compose-yml 编辑
+####        2.1. 首先创建一个外部网络(可跳过)
 
-> 维护myql8和tomcat8：
-
-#####        1. 首先创建一个外部网络		
+- 此步可略过，docker-compose在up启动时会自动创建默认的
 
 ```sh
+# 在docker-compose.yml所在目录 
 docker network create myout-network # 创建外部网络 # 统一使用该网络容器间可以用服务名代替ip访问
 docker network list # 查看已存在的网络
 ```
+
+#### 	2.2、docker-compose-yml 编辑
+
 
 ```yml
 version: '3.7'
@@ -445,12 +452,13 @@ networks:
 docker-compose up -d # -d后台启动
 ```
 
-#### 2.2、docker-compose命令管理容器
+
+
+### 3）docker-compose命令管理容器
 
 > 使用docker-compose时，默认会在当前命令下找docker-compose.yml文件
 
 ```sh
-mkdir /data/docker/mysql /data/docker/tc8
 #1. 基于docker-compose.yml启动管理容器
 docker-compose up -d # -d后台启动
 #2. 关闭并删除容器
@@ -465,7 +473,7 @@ docker-compose logs -f
 docker-compose build
 ```
 
-### 3）docker-compose配合Dockerfile
+### 4）docker-compose配合Dockerfile
 
 > 使用docker-compose.yml文件和Dockerfile在生成自定义镜像的同时启动当前镜像，并且由docker-compose去管理容器
 
@@ -505,9 +513,9 @@ docker-compose build
 docker-compose up -d --build
 ```
 
-### 4）容器间的网络通信 - Network设置
+### 5）容器间的网络通信 - Network设置
 
-#### 4.1 同宿主机下 容器间如何互相通信
+#### 5.1 同宿主机下 容器间如何互相通信
 
 * 默认compose会为每个容器创建一个默认网络便于容器和宿主的通信(名称：{project_name}_default)，相当于式不同的局域网
 * 容器间无法直接通信(只能把端口通过暴露到宿主机，然后通过宿主ip+外端口访问)
@@ -568,16 +576,17 @@ networks:
 # 5. 启动 docker-compose up -d
 ```
 
-#### 4.2 终极问题：不同宿主机下，怎么实现容器间网络通信
+#### 5.2 终极问题：不同宿主机下，怎么实现容器间网络通信
 
 - 使用K8s解决 
 
 
 
-### 5）docker-compose搭建Nexus
+## 六、案例
 
-* 搭建Maven私服Nexus   ： docker-compose.yml
-* [docker-compse搭建Nexus.md](./mynexus/docker-compose-Nexus.md "docker-compse搭建Nexu")
+### 1）搭建Maven仓库私服Nexus
+
+* [docker-compse搭建Nexus.md](mynexus/docker-compose-Nexus.md "docker-compse.yml搭建Nexu")
 
 ```yml
 version: '3.7'
@@ -622,15 +631,41 @@ mvn deploy:deploy-file
 
 ***
 
-## 六、搭建Docker私服 Harbor
+### 2）搭建Docker私服 Harbor
 
-- 上传本地镜像到私服
-- 标记镜像：docker tag nginx tagname[eg:192.168.xx/myshop/nginx:latest]
-- 登录Harbor：docker login [ip] -u admin -p pwd
-- 推送镜像到Harbor： docker push tagname
-- 从私服下载：docker pull tagname
+> 搭建企业级私有Register服务器
+> Harbor支持微服务架构 适合CI/CD持续集成开发模式(代理，同步，多服务)
+
+1）安装
+
+- [官网](https://github.com/goharbor/harbor) 下载 offline 安装Wiki说明安装
+
+![image-20201109220727235](typora-user-images/harbor001-install.png)
+
+2）配置客户端
+
+在/etc/docker/daemon.json中配置仓库地址
+
+```json
+{
+  "registry-mirrors":["https:///"]
+  "inseccure-registries":["myharbor仓库地址"]
+}
+```
+
+> - 上传本地镜像到私服
+> - 标记镜像为新的镜像：docker tag nginx:latest 192.168.xx/myshop/nginx:latest
+> - 登录Harbor：docker login 192.168.xx -u admin -p harborPwd
+> - 推送镜像到Harbor： docker push 192.168.xx/myshop/nginx:latest  # tagname
+> - 从私服下载：docker pull tagname
+
+
 
 [asd ](./daemon.json.txt)
+
+### 3）搭建Gitlab仓库
+
+> 跳转至 @【[七.3 实现持续继承](#31搭建gitlab服务器)】
 
 ## 七、Docker CI、CD
 
@@ -721,7 +756,13 @@ docker-compose up -d && docker-compose logs -f
 # http://192.168.199.110:80
 # 并设置密码并登录：root/设置的密码
 # 登录并创建一个testci工程
+
 ```
+
+> - 客户端使用ssh拉取和推送 (代替 http账号密码方式拉取, ) -- why: (免密) 不会阻塞，后续CI/CI需要
+>   1. 生成ssh key（在git安装目录D:\program\Git\usr\bin 输入命令: ssh-keygen -t rsa -C "youremail@examle.com"）
+>   2. 生成密钥文 C:\users/xxx/.ssh\id_rsa ，将id_rsa.pub内容复制到gitlab的用户-设置-SSH中
+>   3. 即可使用ssh协议拉取推送代码
 
 #### 3.2、GitLab-Runner 
 
@@ -877,11 +918,14 @@ docker-compose up -d && docker-compose logs -f
 
 #### 5.5 Jenkins(真实学不动了)
 
-* [后续课程][https://www.bilibili.com/video/BV1sK4y1s7Cj?p=25?]
+* [后续课程](https://www.bilibili.com/video/BV1sK4y1s7Cj?p=25?)
+* <a href="https://www.bilibili.com/video/BV1sK4y1s7Cj?p=25" target="_blank">后续课程1</a>
 
-* <a href="https://www.bilibili.com/video/BV1sK4y1s7Cj?p=25" target="_blank">后续课程</a>
+八、其它
 
-## END
+> - <a href="http://hemiao3000.gitee.io/java-note-for-free/" target="_blank">别人的笔记</a>
+
+END
 
 ***
 
