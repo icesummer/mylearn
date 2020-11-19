@@ -871,7 +871,7 @@ redis解决事务问题的基本原理是利用setnx的存在就false的原理�
   databases 16 # 默认的数据库数量16个
   ```
 
-- 复制配置 <Replication> -- 主从复制相关  [Redis主从复制](#五、Redis主从复制)
+- 复制配置 <Replication> -- 主从复制相关  [Redis主从复制](#五redis主从复制)
 
   ```shell
   
