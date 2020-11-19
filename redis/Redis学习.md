@@ -756,7 +756,7 @@ public StringRedisTemplate stringRedisTemplate(RedisConnectionFactory redisConne
 
 > 对象序列化
 >
-> - redisTemplate默认的序列化为RedisTemplate<Object, Object> 和StringRedisTemplate 
+> - 默认的序列化为RedisTemplate<Object, Object> 和StringRedisTemplate 
 >   //实际开发需要配置为RedisTemplate<String, Object>
 > - 配置具体的序列化方式：
 >
@@ -871,7 +871,7 @@ redis解决事务问题的基本原理是利用setnx的存在就false的原理�
   databases 16 # 默认的数据库数量16个
   ```
 
-- 复制配置 <Replication> -- 主从复制相关  [Redis主从复制](五、Redis主从复制)
+- 复制配置 <Replication> -- 主从复制相关  [Redis主从复制](#五、Redis主从复制)
 
   ```shell
   
