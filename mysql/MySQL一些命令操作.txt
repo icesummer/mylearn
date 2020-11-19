@@ -8,7 +8,7 @@ NprF3:g,4Jtr
 1、复制原先目录下的文件到新目录
 2、修改配置文件my.cnf的datadir=新目录
 
-CREATE USER 'pig'@'192.168.1.101_' IDENDIFIED BY '123456'; 
+CREATE USER 'pig'@'192.168.1.101_' IDENTIFIED BY '123456'; 
 GRANT privileges ON databasename.tablename TO 'actiongo'@'localhost';
 GRANT ALL ON actiongo_db.* TO 'actiongo'@'%'; 
 GRANT ALL ON actiongo_db.* TO 'actiongo'@'localhost'; 

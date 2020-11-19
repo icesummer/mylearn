@@ -248,3 +248,11 @@ VIM 复制：
 在命令模式下，将光标移动到将要复制的首行处，按“nyy”复制n行；其中n为1、2、3……
 2、粘贴
 在命令模式下，将光标移动到将要粘贴的行处，按“p”进行粘贴
+
+
+用vmware虚拟机 共享主机文件夹：
+安装VMwareTools,
+用vmware-hgfsclient命令可以看到你的共享文件夹目录，这个命令是你安装了vmwaretools成功后生成的
+6、新建文件夹mkdir /mnt/win
+接着/usr/bin/vmhgfs-fuse .host:/ /mnt/win -o subtype=vmhgfs-fuse,allow_other
+-- > 共享文件夹即可出现在虚拟即的/mnt/win下

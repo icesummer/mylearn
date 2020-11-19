@@ -120,8 +120,10 @@ docker rm [-f] [containerID]  # 删除某容器,不加-f只能删已停止的
 
 ```shell
 docker rm -f $(docker ps -a -q) # 删除所有容器
-docker rm -f $(docker ps -a |grep Exited) # 删除不运行的容器
+docker rm $(docker ps -qf status=exited)# 删除不运行的容器
 docker ps -a -q|xargs docker rm # 同1
+# 显示停止的容器
+docker ps -a|grep Exited|awk '{print $1}'
 ```
 
 #### 1.3.7  查看容器日志
