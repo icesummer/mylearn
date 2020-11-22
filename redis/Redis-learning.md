@@ -1331,7 +1331,7 @@ eg: set k xxx
 
 ### 2）集群搭建
 
-- redis4.x版本参考：[redis4.x以下rubby搭建](redis4.x-cluster搭建.mb)
+- redis4.x版本参考：[redis4.x以下rubby搭建](./Redis4.x-cluster-build.md)
 
 - redis5+参考：[网上案例](https://www.cnblogs.com/sanduzxcvbnm/p/11300942.html)
 
