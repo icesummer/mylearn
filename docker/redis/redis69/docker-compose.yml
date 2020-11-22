@@ -1,0 +1,22 @@
+version: '3.7'
+services:
+  redis6:
+    #image: redis
+    container_name: redis6
+    build:
+      context: .
+      dockerfile: Dockerfile
+    privileged: true
+    volumes:
+      - ./datadir:/data
+      - ./logs:/logs
+    #command:
+#      两个写入操作 只是为了解决启动后警告 可以去掉
+     # echo 'ls /usr/local'
+    #  redis-server /usr/local/etc/redis/redis.conf
+    ports:
+     - 6381:6379
+networks:
+  default:
+    external:
+      name: ctos-network

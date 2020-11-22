@@ -17,6 +17,8 @@
 
 　　make install PREFIX=/usr/local/redis
 
+
+   # make && make PREFIX=/usr/local/redis install 
 4.移动配置文件到安装目录下
 
 　　cd ../

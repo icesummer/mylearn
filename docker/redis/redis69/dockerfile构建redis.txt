@@ -1,0 +1,61 @@
+httpswww.cnblogs.comxiaoxiaozhoup11316965.html
+
+
+1、创建项目目录并下载包及文件
+
+mkdir centos_redis
+cd centos_redis
+wget http://download.redis.io/releases/redis-5.0.5.tar.gz
+wget http://mirrors.aliyun.com/repo/epel-7.repo
+wget http://mirrors.163.com/.help/CentOS7-Base-163.repo
+
+tar -zxf redis-5.0.5.tar.gz 
+
+
+2、编辑Dockerfile
+
+FROM centos:latest
+
+MAINTAINER xiaozhou (xiaozhou@docker.com)
+LABEL Discription="基于centos的redis镜像" version="1.0"
+
+RUN rm /etc/yum.repos.d/*
+ADD redis-5.0.5 /data/usr/src/redis
+ADD CentOS7-Base-163.repo /etc/yum.repos.d
+ADD epel-7.repo /etc/yum.repos.d
+RUN rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7 \
+&& yum provides '*/applydeltarpm' && yum install deltarpm -y \
+&& yum install -y gcc gcc-c++ automake autoconf libtool make \
+&& cd /data/usr/src/redis \
+&& make PREFIX=/data/usr/redis install MALLOC=libc \
+&& mkdir /data/usr/redis/{run,conf,logs,data} \
+&& cp /data/usr/src/redis/redis.conf /data/usr/redis/conf/ \
+&& sed -i "s/bind 127.0.0.1/bind 0.0.0.0/" /data/usr/redis/conf/redis.conf \
+&& sed -i "s/daemonize no/daemonize yes/" /data/usr/redis/conf/redis.conf \
+&& sed -i "s#pidfile /var/run/redis_6379.pid#pidfile /data/usr/redis/run/redis_6379.pid#" /data/usr/redis/conf/redis.conf \
+&& sed -i 's#logfile ""#logfile "/data/usr/redis/logs/redis.log"#' /data/usr/redis/conf/redis.conf \
+&& sed -i "s#dir ./#dir /data/usr/redis/data#" /data/usr/redis/conf/redis.conf \
+&& sed -i "s/# requirepass foobared/requirepass Redis2019\!/" /data/usr/redis/conf/redis.conf
+
+ENV REDIS_HOME=/data/usr/redis
+ENV PATH=$PATH:$REDIS_HOME/bin
+ 
+
+3、构建镜像
+
+docker build -t centos:redis .
+ 
+
+4、启动容器
+
+docker run --name redis -d -p 6379:6379 -it centos:redis
+ 
+
+5、启动服务
+
+进入容器
+
+docker exec -it  container_id
+
+redis-server /data/usr/redis/conf/redis.conf
+
