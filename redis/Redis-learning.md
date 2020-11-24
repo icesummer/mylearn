@@ -13,11 +13,47 @@
   - Redis支持数据的持久化，可以将内存中的数据保存在磁盘中，重启的时候可以再次加载进行使用。
   - Redis不仅仅支持简单的key-value类型的数据，同时还提供list，set，zset，hash等数据结构的存储。
   - Redis支持数据的备份，即master-slave模式的数据备份。
-* Redis是单线程：**6.0后支持多线程**
+* Redis是单线程：**6.0后支持多线程** 但命令执行仍是单线程？
   * Redis是基于内存操作的，不依赖CPU切换所以(其单线程命令)效率很高，其瓶颈跟内存和网络带宽相关
 * 支持，事物和磁盘持久化； 集群 > 通过哨兵模式(Sentinel)和自动分区(Cluster)提供分布式
 
-###  1.1 redis自带的压力测试工具 
+###  1.1 安装
+
+解压安装包：
+
+```
+tar -zxvf redis-6.0.9.tar.gz
+```
+
+
+
+安装6版本的redis，gcc版本一定要5.3以上，centos6.6默认安装4.4.7；centos7.5.1804默认安装4.8.5，这里要升级gcc了。
+
+- 升级gcc
+
+```sh
+yum -y install centos-release-scl && yum -y install devtoolset-9-gcc devtoolset-9-gcc-c++ devtoolset-9-binutils && scl enable devtoolset-9 bash
+gcc-v # 查看版本
+```
+
+- 安装
+
+```shell
+make & make install prefix=/usr/local/redis # 安装源码到redis文件夹下
+```
+
+- 启动
+
+```shell
+./bin/redis-server # 单机启动
+vim redis.conf # port,daemonize yes,
+```
+
+
+
+###  1.2 redis自带的压力测试工具 
+
+
 
 - redis-benchmark
 
@@ -41,9 +77,9 @@ redis-benchmark -n 10000 -c100 -q # -n 指定10000个并发; -c 100个连接数;
 >
 > 
 
-### 1.2 基本命令
+### 1.3 基本命令
 
-#### 1.2.1 config配置命令：
+#### 1） config配置命令：
 
 > 1）获取redis配置项
 >
@@ -53,13 +89,13 @@ redis-benchmark -n 10000 -c100 -q # -n 指定10000个并发; -c 100个连接数;
 > # 编辑所有配置项 > $ redis 127.0.0.1:6379> CONFIG SET daemonize "yes" # 改为守护模式
 > ```
 
-####  1.2.2  启动服务与连接
+####  2）  启动服务与连接
 ```shell
 redis-server redis.conf # 启动服务
 redis-cli -h host -p port -a password # 客户端连接
 ```
 
-####  1.2.3  客户端基本操作
+####  3）  客户端基本操作
 
 > redis默认16个数据库 #配置： databases 16
 >
@@ -84,9 +120,7 @@ redis-cli -h host -p port -a password # 客户端连接
 > info replication # 查看其中的主从信息
 > ```
 
-### 1.3  Redis数据类型
-
-### 1.3.1 五大数据类型
+### 1.4  Redis五大数据类型
 
 ####  1 > String:
 
@@ -298,14 +332,11 @@ zcount salary:2 3000 5000 # score为3000到5000的数量  无穷(-inf +inf)
 
 # 应用场景
 # # # 消息排序，带权重排序，排行榜，工资表，成绩表  Top-N 
-
 ```
 
 
 
-
-
-### 1.3.2 三大特殊类型
+### 1.5 Redis三大特殊类型
 
 #### 1 > geospatial（地理空间）
 
@@ -1231,7 +1262,7 @@ Node1->Node2->Node3 #
 
 ### 2）槽点
 
-- 6383个槽点
+- 16384个槽点
 
 ### 3）哨兵模式Sentinel (自动主从切换)
 
@@ -1303,7 +1334,7 @@ Node1->Node2->Node3 #
 
 ## 五、Redis集群
 
-### 1）集群概述()
+### 1）集群概述
 
 redis集群节点中，彼此互联，(ping-pong机制)，不需要连接所有节点，可连接集群中人一个可用节点
 
@@ -1332,8 +1363,255 @@ eg: set k xxx
 ### 2）集群搭建
 
 - redis4.x版本参考：[redis4.x以下rubby搭建](./Redis4.x-cluster-build.md)
+- redis5+参考：<a href="https://www.cnblogs.com/sanduzxcvbnm/p/11300942.html" target="_blank">网上案例</a>
 
-- redis5+参考：[网上案例](https://www.cnblogs.com/sanduzxcvbnm/p/11300942.html)
+> redis6.0.9 安装：
+
+```sh
+mkdir -p redis-cluster/700{1,2,3,4,5,6}
+
+cp /data/local/soft/redis-6.0.9/redis.conf ./redis_cluster/7001/ ./redis_cluster/7002/ ./redis_cluster/7003/ ./redis_cluster/7004/ ./redis_cluster/7005/ ./redis_cluster/7006/
+
+```
+
+vim redis.conf
+
+```sh
+# cd /usr/local/bin/redis-6.0.0/redis_cluster
+# mkdir {7001,7002,7003,7004,7005,7006}
+# mkdir -p /var/log/redis/{7001,7002,7003,7004,7005,7006}
+
+# redis.conf文件示例
+bind 192.168.1.201 # 其他客户端能访问的该机ip
+port 7001  # 对应各自端口号
+daemonize yes
+pidfile /var/run/redis_7001.pid # 对应各自端口号
+dir "./" # node.conf文件保存路径
+logfile "./logs/redis7001.log"
+appendonly no # 此处不应开启aof存储
+appendfsync always
+cluster-enabled yes
+cluster-config-file nodes/nodes-7001.conf # 该文件中包含集群信息 保存在dir的目录下
+
+# 其他配置文件类似，把端口号修改一下就行了
+```
+
+启动所有节点
+
+```sh
+#!/bin/bash
+#### vim /usr/local/bin/redis_cluster/start_cluster.sh
+cur_path=$(cd `dirname $0`; pwd)
+cur_name="${project_path##*/}"
+echo $cur_path
+/usr/local/bin/redis-server $cur_path/7001/redis.conf
+/usr/local/bin/redis-server $cur_path/7002/redis.conf
+/usr/local/bin/redis-server $cur_path/7003/redis.conf
+/usr/local/bin/redis-server $cur_path/7004/redis.conf
+/usr/local/bin/redis-server $cur_path/7005/redis.conf
+/usr/local/bin/redis-server $cur_path/7006/redis.conf
+
+# chmod +x start_cluster.sh
+# sh start_cluster.sh
+```
+
+关闭redis所有节点脚本
+
+```sh
+#!bin/bash
+## 关闭700x端口的redis节点：vim stop_cluster.sh
+ps -ef | grep redis | grep 700 | grep -v grep | awk '{print $2}'| xargs kill -9
+echo 'close all success'
+```
+
+- 创建集群命令
+
+```sh
+redis-cli --cluster create 192.168.1.201:7001 192.168.1.201:7002 192.168.1.201:7003 192.168.1.201:7004 192.168.1.201:7005 192.168.1.201:7006 --cluster-replicas 1
+
+# --cluster-replicas 1  表示主从配置比，1表示的是1:1，前三个是主，后三个是从
+# 若配置文件中设置的密码，则还需要加上-a passwod
+```
+
+- 查看集群信息
+
+```sh
+redis-cli -c -h 127.0.0.1 -p 7001 cluster nodes
+# -c：表示以集群方式连接惹redis
+# cluster nodes：查询集群节点信息
+# cluster info：查询集群状态信息
+# 或者：
+redis-cli --cluster check 127.0.0.1:7001
+# 或者查看cluster-config-file配置的文件：
+cat nodes/nodes-7001.conf
+
+# eg: 
+[root@icesummer bin]# redis-cli -c -h 127.0.0.1 -p 7001 cluster nodes
+f38845ab85a24db4521d226939f2a56d0c0742b5 127.0.0.1:7001@17001 myself,master - 0 1606100873000 1 connected 0-5460
+ec7795db3845a8aa50f53899d5df318c1e541402 127.0.0.1:7004@17004 slave f38845ab85a24db4521d226939f2a56d0c0742b5 0 1606100871976 1 connected
+382846dc15607ac916a570a2aa89128289915237 127.0.0.1:7006@17006 slave 80d55a0208652e8cc9825d2baae6b27142b97299 0 1606100873001 3 connected
+a6dbf31b20eb08d7dca4007615e318297182b405 127.0.0.1:7002@17002 master - 0 1606100874027 2 connected 5461-10922
+80d55a0208652e8cc9825d2baae6b27142b97299 127.0.0.1:7003@17003 master - 0 1606100873000 3 connected 10923-16383
+8e99956cee893e813c73772beaf1b389896b7de0 127.0.0.1:7005@17005 slave a6dbf31b20eb08d7dca4007615e318297182b405 0 1606100871000 2 connected
+```
+
+- redis cluster集群重新启动
+
+```sh
+# 因为集群已经创建过了，若关闭了redis服务，则只需要执行批量启动脚本即可，就会自动开启集群，因为有node.conf文件的存在
+```
+
+- 测试主从生效：
+
+```sh
+#1. master7001设置ck
+[root@icesummer redis_cluster]# redis-cli -p 7001 -c 
+127.0.0.1:7001> set ck aa
+OK
+#1. slave7004可以获取ck：
+[root@icesummer redis-6.0.9]# redis-cli -p 7004 -c
+127.0.0.1:7004> get ck
+-> Redirected to slot [948] located at 127.0.0.1:7001
+"aa"
+127.0.0.1:7001> 
+
+# 关闭7001后7004升级为Master节点，再重启7001此时7001为Slave节点；
+```
+
+
+
+- 集群帮助命令
+
+```sh
+redis-cli --cluster help
+```
+
+### 3）集群管理
+
+#### 1 添加新主节点
+
+```bash
+redis-cli --cluster add-node new_host:new_port existing_host:existing_port --cluster-master-id node_id
+```
+
+#### 2 hash槽重新分配
+
+添加完新节点后，需要对新添加的主节点进行hash槽重新分配，这样该主节点才能存储数据，redis共有16384个槽。
+
+```bash
+redis-cli --cluster reshard host:port --cluster-from node_id --cluster-to node_id --cluster-slots <args> --cluster-yes
+```
+
+#### 3 添加新从节点
+
+```bash
+redis-cli --cluster add-node new_host:new_port existing_host:existing_port --cluster-slave --cluster-master-id node_id
+```
+
+#### 4 删除节点
+
+```bash
+redis-cli --cluster  del-node host:port node_id
+```
+
+#### 5 集群常用命令
+
+```bash
+# 创建集群
+redis-cli --cluster create host1:port1 ... hostN:portN --cluster-replicas <arg>
+# 例子
+redis-cli --cluster create 127.0.0.1:7001 127.0.0.1:7002 127.0.0.1:7003 127.0.0.1:7004 127.0.0.1:7005 127.0.0.1:7006 --cluster-replicas 1
+# 例子说明
+host1:port1 ... hostN:portN表示的是要添加的集群的节点IP和端口，
+--cluster-replicas <arg>表示的是主从节点比例，参数1表示前三个是主节点，后三个是从节点
+也就是说7001,7002,7003端口对应的节点是主节点，7004,7005,7006对应的节点是从节点
+
+# 查询集群节点信息
+redis-cli -c -p 7001 cluster nodes        
+7d388cc31df969d3e1715ce9644318bfd48317b1 127.0.0.1:7004@17004 slave 59b6597448b668a355d85dcc7a0623bc36263e5f 0 1564923261350 4 connected
+bbe8b7035bfd31c47bec7d612acc112cd2869368 127.0.0.1:7003@17003 master - 0 1564923263366 3 connected 10923-16383
+456921ae96af71d8183101f798cf5ceda4b0381e 127.0.0.1:7005@17005 slave bbe8b7035bfd31c47bec7d612acc112cd2869368 0 1564923262000 5 connected
+5612ffbb0407dbda50828b505a16b39ede51168b 127.0.0.1:7006@17006 slave 4dad696ede24995a57c5fd790faa95c72c187a22 0 1564923260000 6 connected
+4dad696ede24995a57c5fd790faa95c72c187a22 127.0.0.1:7001@17001 myself,master - 0 1564923263000 1 connected 0-5460
+59b6597448b668a355d85dcc7a0623bc36263e5f 127.0.0.1:7002@17002 master - 0 1564923262358 2 connected 5461-10922
+
+# 说明：以下的操作均是以上面这个为参数示例
+
+# 给集群添加一个新主节点
+redis-cli --cluster add-node new_host:new_port existing_host:existing_port --cluster-master-id node_id
+# 例子
+redis-cli --cluster add-node 127.0.0.1:7007 127.0.0.1:7003 --cluster-master-id bbe8b7035bfd31c47bec7d612acc112cd2869368
+# 例子说明
+new_host:new_port为要新添加的主节点IP和端口，此处是127.0.0.1:7007
+existing_host:existing_port表示的是已存在的最后一个主节点的IP和端口，这个可以从上述的节点信息中查看到，根据slots槽数，7003端口对应的节点槽数是10923-16383，16383表示的是最后的槽数
+--cluster-master-id表示的是最后一个主节点的节点id，表示的是新添加的主节点要在这个节点后面
+
+# 再次查看集群信息
+redis-cli -c -p 7001 cluster nodes        
+7d388cc31df969d3e1715ce9644318bfd48317b1 127.0.0.1:7004@17004 slave 59b6597448b668a355d85dcc7a0623bc36263e5f 0 1564923261350 4 connected
+bbe8b7035bfd31c47bec7d612acc112cd2869368 127.0.0.1:7003@17003 master - 0 1564923263366 3 connected 10923-16383
+7020c8df9423686727783c60bd2f0e367634ba84 127.0.0.1:7007@17007 master - 0 1564923260344 0 connected
+456921ae96af71d8183101f798cf5ceda4b0381e 127.0.0.1:7005@17005 slave bbe8b7035bfd31c47bec7d612acc112cd2869368 0 1564923262000 5 connected
+5612ffbb0407dbda50828b505a16b39ede51168b 127.0.0.1:7006@17006 slave 4dad696ede24995a57c5fd790faa95c72c187a22 0 1564923260000 6 connected
+4dad696ede24995a57c5fd790faa95c72c187a22 127.0.0.1:7001@17001 myself,master - 0 1564923263000 1 connected 0-5460
+59b6597448b668a355d85dcc7a0623bc36263e5f 127.0.0.1:7002@17002 master - 0 1564923262358 2 connected 5461-10922
+# 会发现7007端口对应的节点已经加入到集群中，是主节点，但是没有从节点，也没有分配槽数
+
+# 给新添加的主节点分配slots槽数
+redis-cli --cluster reshard host:port --cluster-from node_id --cluster-to node_id --cluster-slots 500 --cluster-yes
+# 例子
+redis-cli --cluster reshard 127.0.0.1:7007 --cluster-from 4dad696ede24995a57c5fd790faa95c72c187a22 --cluster-to 7020c8df9423686727783c60bd2f0e367634ba84 --cluster-slots 500 
+# 例子说明
+host:port表示的是新添加的那个主节点IP和端口，此处表示的是127.0.0.1:7007
+--cluster-from node_id表示的是集群第一个主节点的节点id，这个可以现有集群的slots槽数分配看出，此处表示的是7001端口对应的节点
+--cluster-to node_id表示的是集群最后一个主节点的节点id,也就是新添加的那个主节点id,此处表示的是7007端口对应的节点
+--cluster-slots 500表示的是给新主节点分配多少，此处500表示是分配从0-499个slots槽数，若不加上这个会让手动输入
+--cluster-yes表示的是自动应答为yes,若不加上这个会让手动输入yes,表示同意此次分配
+
+# 再次查看集群信息
+/redis-cli -c -p 7001 cluster nodes                                         7d388cc31df969d3e1715ce9644318bfd48317b1 127.0.0.1:7004@17004 slave 59b6597448b668a355d85dcc7a0623bc36263e5f 0 1564924042000 4 connected
+bbe8b7035bfd31c47bec7d612acc112cd2869368 127.0.0.1:7003@17003 master - 0 1564924042157 3 connected 10923-16383
+7020c8df9423686727783c60bd2f0e367634ba84 127.0.0.1:7007@17007 master - 0 1564924040140 7 connected 0-499
+456921ae96af71d8183101f798cf5ceda4b0381e 127.0.0.1:7005@17005 slave bbe8b7035bfd31c47bec7d612acc112cd2869368 0 1564924040000 5 connected
+5612ffbb0407dbda50828b505a16b39ede51168b 127.0.0.1:7006@17006 slave 4dad696ede24995a57c5fd790faa95c72c187a22 0 1564924041149 6 connected
+4dad696ede24995a57c5fd790faa95c72c187a22 127.0.0.1:7001@17001 myself,master - 0 1564924040000 1 connected 500-5460
+59b6597448b668a355d85dcc7a0623bc36263e5f 127.0.0.1:7002@17002 master - 0 1564924043166 2 connected 5461-10922
+# 会发现7007端口对应的主节点已经有slots槽数了，并且是从0开始的
+
+# 给集群中某个主节点再添加一个从节点
+redis-cli --cluster add-node new_host:new_port existing_host:existing_port --cluster-slave --cluster-master-id node_id
+# 例子
+redis-cli --cluster add-node 127.0.0.1:7007 127.0.0.1:7008 --cluster-slave --cluster-master-id 7020c8df9423686727783c60bd2f0e367634ba84
+# 例子说明
+new_host:new_port表示的是要添加的那个从节点的IP和端口，此处表示的是127.0.0.1:7008
+existing_host:existing_port表示的是要给哪个主节点添加从节点，此处表示的是127.0.0.1:7007
+--cluster-slave表示的是要添加从节点，否则则是添加主节点了
+--cluster-master-id node_id表示要给哪个主节点添加从节点的该主节点节点id
+
+# 再次查看集群信息
+redis-cli -c -p 7001 cluster nodes                                         7020c8df9423686727783c60bd2f0e367634ba84 127.0.0.1:7007@17007 master - 0 1564924845000 7 connected 0-499
+4dad696ede24995a57c5fd790faa95c72c187a22 127.0.0.1:7001@17001 myself,master - 0 1564924843000 1 connected 500-5460
+5612ffbb0407dbda50828b505a16b39ede51168b 127.0.0.1:7006@17006 slave 4dad696ede24995a57c5fd790faa95c72c187a22 0 1564924845214 6 connected
+7d388cc31df969d3e1715ce9644318bfd48317b1 127.0.0.1:7004@17004 slave 59b6597448b668a355d85dcc7a0623bc36263e5f 0 1564924843195 4 connected
+bbe8b7035bfd31c47bec7d612acc112cd2869368 127.0.0.1:7003@17003 master - 0 1564924844205 3 connected 10923-16383
+456921ae96af71d8183101f798cf5ceda4b0381e 127.0.0.1:7005@17005 slave bbe8b7035bfd31c47bec7d612acc112cd2869368 0 1564924845000 5 connected
+415db07121ba946b202bca98e15cbdffc60bc18a 127.0.0.1:7008@17008 slave 7020c8df9423686727783c60bd2f0e367634ba84 0 1564924846224 7 connected
+c3e04f0e8710c25d59703374a224ee8bec776e43 :0@0 master,fail,noaddr - 1564924804548 1564924802833 0 disconnected
+59b6597448b668a355d85dcc7a0623bc36263e5f 127.0.0.1:7002@17002 master - 0 1564924844000 2 connected 5461-10922
+# 会发现7008端口对应的节点已经是7007端口对应的从节点
+
+# 从集群中删除一个从节点
+redis-cli --cluster  del-node host:port node_id
+# 例子
+redis-cli --cluster del-node 127.0.0.1:7008 415db07121ba946b202bca98e15cbdffc60bc18a
+# 例子说明
+host:port表示的是要删除的那个节点的IP和端口，此处是127.0.0.1:7008
+node_id表示的是删除的那个节点的节点id
+
+# 其他命令有待补充
+```
+
+### 5.9 注意事项
 
 ---
 
@@ -1608,12 +1886,28 @@ try {
 
 
 ```java
-
+// 单机模式
 @Bean
 public Redisson redisson(){
     Config config = new Config();
     config.useSingleServer().setAddress("redis://ctos.javazz.com:6380").setDatabase(0);// 单机模式
     RedissonClient redisson = Redisson.create(config);// 默认连接地址 127.0.0.1:6379
+    return (Redisson) Redisson.create(config);
+}
+
+// 集群模式
+@Bean
+public Redisson redisson(){
+    Config config = new Config();
+    config.useClusterServers()
+        .setScanInterval(2000) // 集群状态扫描间隔时间，单位是毫秒
+        //可以用"rediss://"来启用SSL连接
+        .addNodeAddress("redis://192.168.1.201:7001", "redis://192.168.1.201:7002", "redis://192.168.1.201:7003")
+        .addNodeAddress("redis://192.168.1.201:7004", "redis://192.168.1.201:7005", "redis://192.168.1.201:7006")
+        .setScanInterval(1000)// 集群扫描间隔时间
+        .setReadMode(ReadMode.SLAVE)// 旨在从节点读取
+        //.setPassword("123!@#")// 节点身份验证的密码。
+        ;
     return (Redisson) Redisson.create(config);
 }
 @Autowired
@@ -1626,7 +1920,7 @@ https://gitee.com/moujing/redisson/blob/master/DistributedLockAspect.java
 
 ```java
 String stockKey = "1:stock";// 库存key
-String lockKey = "1:stockLockKey";
+String lockKey = "1:stockLockKey";// 锁key
 RLock redissonLock = redisson.getLock(lockKey);// 获取锁对象
 try {
     redissonLock.lock(); // 相当于 setIfAbsent(lockkey,lockvalue,expire,TimeUnit);
