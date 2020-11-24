@@ -94,7 +94,7 @@ docker ps [OPTIONS]
 
 #### 1.3.3 退出和进入运行中容器
 
-​	1.3.3.1 交互启动模式下--两种：
+	1.3.3.1 交互启动模式下--两种：
 
  	1. `exit`  容器内执行，容器停止并退出
  	2. 快捷键：`ctrl+P+Q  ` 容器不停止退出
@@ -107,9 +107,9 @@ docker ps [OPTIONS]
 
 #### 1.3.5  启动和重启容器
 
-​	`docker start [containerID]`
-
-​	`docker restart [containerID]`
+	`docker start [containerID]`
+	
+	`docker restart [containerID]`
 
 #### 1.3.6  删除已停止容器
 
@@ -136,11 +136,11 @@ docker logs -f -t --tail [容器ID]
 ```
 #### 1.3.8   查看容器内运行的进程
 
-​	`docker top 容器ID`
+	`docker top 容器ID`
 
 #### 1.3.9   查看容器内部细节
 
-​	`docker inspect 容器ID`
+	`docker inspect 容器ID`
 
 #### 1.3.10  进入正在运行的容器并以命令交互
 
@@ -365,7 +365,7 @@ docker run -d -p 9090:8080 --name myweb -v /data/docker/tomcat9/myweb:/usr/local
 ``` scss
 1、[下载地址][https://github.com/docker/compose] docker-compose-Linux-x86_64
 2、传至linux，/data/installs/docker-compose/ 修改名称为docker-compose
-​	chmod 755 docker-compose
+	chmod 755 docker-compose
 3、增加配置环境变量
 vim /etc/profile
 export $PATH:/data/installs/docker-compose
@@ -448,7 +448,7 @@ networks:
     external: true  # 使用外部网络true
 ```
 
-​		2. 后台启动
+		2. 后台启动
 
 ``` sh
 docker-compose up -d # -d后台启动
@@ -836,22 +836,22 @@ docker-compose up -d && docker-compose logs -f
 > # linux：
 > docker pull jenkinsci/blueocean
 > docker run \
->   -u root \
->   --rm \  # （可选） jenkinsci/blueocean 关闭时自动删除Docker容器（下图为实例）。如果您需要退出Jenkins，这可以保持整洁。
->   --name jenkins-blueocean \
->   -d \ 
->   -p 8080:8080 \ 
->   -p 50000:50000 \ 
->   -v jenkins-data:/var/jenkins_home \ 
->   -v /var/run/docker.sock:/var/run/docker.sock \ 
->   jenkinsci/blueocean 
+> -u root \
+> --rm \  # （可选） jenkinsci/blueocean 关闭时自动删除Docker容器（下图为实例）。如果您需要退出Jenkins，这可以保持整洁。
+> --name jenkins-blueocean \
+> -d \ 
+> -p 8080:8080 \ 
+> -p 50000:50000 \ 
+> -v jenkins-data:/var/jenkins_home \ 
+> -v /var/run/docker.sock:/var/run/docker.sock \ 
+> jenkinsci/blueocean 
 > ```
 >
 > ---
 >
 > ```sh
 > # windows：
->   docker run -u root  --rm  --name jenkins  -d -p 8080:8080  -p 50000:50000  -v jenkins-data:/var/jenkins_home  -v /var/run/docker.sock:/var/run/docker.sock jenkins
+> docker run -u root  --rm  --name jenkins  -d -p 8080:8080  -p 50000:50000  -v jenkins-data:/var/jenkins_home  -v /var/run/docker.sock:/var/run/docker.sock jenkins
 > ```
 >
 > [docker-compose.yml]()
@@ -862,11 +862,11 @@ docker-compose up -d && docker-compose logs -f
 > # cd jenkins_home
 > version: '3.7'
 > services:
->   jenkins:
->     images: jenkinsci/blueocean
->     restart: always
->     container_name: jenkins
->     ports: 
+> jenkins:
+>  images: jenkinsci/blueocean
+>  restart: always
+>  container_name: jenkins
+>  ports: 
 >       - 8888: 8080
 >       - 50000: 50000
 >     volumes:
@@ -930,4 +930,3 @@ docker-compose up -d && docker-compose logs -f
 END
 
 ***
-
