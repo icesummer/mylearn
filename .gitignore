@@ -1,6 +1,7 @@
 /task-schedule/
 /tomcat/
-/spring-cloud/config-git/
+/spring/core/
+/spring/spring-cloud/config-git/
 /chengkao/
 /docker/mynexus/data/
 /docker/gitlab/data/

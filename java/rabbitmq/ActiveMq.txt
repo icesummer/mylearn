@@ -1,0 +1,99 @@
+ActiveMq：
+ 	默认端口61616
+JMS通过面向消息中间件把消息发送给消息服务器：
+JMS只是定义了Java访问消息中间件的接口，其实就是在包javax.jms中，你会发现这个包下除了异常定义，其他都是interface
+
+JMS支持两种消息发送和接收模型：
+一种称为P2P(Ponit to Point)模型即采用点对点的方式发送消息。
+P2P模型是基于队列的，消息生产者发送消息到队列，消息消费者从队列中接收消息，
+队列的存在使得消息的异步传输称为可能，P2P模型在点对点的情况下进行消息传递时采用。
+
+Pub/Sub(Publish/Subscribe，即发布-订阅)模型，
+发布-订阅模型定义了如何向一个内容节点发布和订阅消息，这个内容节点称为topic(主题)。
+主题可以认为是消息传递的中介，消息发布者将消息发布到某个主题，而消息订阅者则从主题订阅消息。
+主题使得消息的订阅者与消息的发布者互相保持独立，不需要进行接触即可保证消息的传递，
+发布-订阅模型在消息的一对多广播时采用。
+Provider/MessageProvider：生产者
+
+Consumer/MessageConsumer：消费者
+
+PTP：Point To Point，点对点通信消息模型
+
+Pub/Sub：Publish/Subscribe，发布订阅消息模型
+
+Queue：队列，目标类型之一，和PTP结合
+
+Topic：主题，目标类型之一，和Pub/Sub结合
+
+ConnectionFactory：连接工厂，JMS用它创建连接
+
+Connnection：JMS Client到JMS Provider的连接
+
+Destination：消息目的地，由Session创建
+
+Session：会话，由Connection创建，实质上就是发送、接受消息的一个线程，因此生产者、消费者都是Session创建的
+
+ActiveMQ目录结构：
+
+bin下面存放的是ActiveMQ的启动脚本activemq.bat，注意分32、64位
+
+conf里面是配置文件，重点关注的是activemq.xml、jetty.xml、jetty-realm.properties。
+在登录ActiveMQ Web控制台需要用户名、密码信息；
+在JMS CLIENT和ActiveMQ进行何种协议的连接、端口是什么等这些信息都在上面的配置文件中可以体现。
+
+data目录下是ActiveMQ进行消息持久化存放的地方，
+默认采用的是kahadb，当然我们可以采用leveldb，或者采用JDBC存储到MySQL，或者干脆不使用持久化机制。
+
+webapps，注意ActiveMQ自带Jetty提供Web管控台
+
+lib中ActiveMQ为我们提供了分功能的JAR包，当然也提供了activemq-all-5.14.4.jar
+
+在JDK安装没有问题的情况下，直接activemq.bat启动它，并访问Web控制台！
+Messages Enqueued：表示生产了多少条消息，记做P
+
+Messages Dequeued：表示消费了多少条消息，记做C
+
+Number Of Consumers：表示在该队列上还有多少消费者在等待接受消息
+
+Number Of Pending Messages：表示还有多少条消息没有被消费，实际上是表示
+
+
+-- 
+访问ActiveMQ web控制台的用户名、密码在哪里配置的？URL当中的端口是在哪里配置的？
+jetty-realm.properties:用户名密码
+jetty.xml :<jettyPort>:Host和Port
+
+---- -----------------------
+写一个生产者发送消息，一个消费者接收消息：
+1、创建ConnectionFactory连接工厂
+2、创建Connection
+	Connection就代表了应用程序和消息服务器之间的通信链路。获得了连接工厂后，就可以创建Connection。
+	事实上，ConnectionFactory存在重载方法：
+	Connection createConnection(String username,String password) 
+	也就是说我们也可以在这里指定用户名、密码进行验证
+3、创建Session
+	Session，用于发送和接受消息，而且是单线程的，支持事务的。
+	如果Session开启事务支持，那么Session将保存一组信息，要么commit到MQ，要么回滚这些消息。
+	Session可以创建MessageProducer/MessageConsumer。
+4、创建Destination
+	session.createQueue("queue1");
+	所谓消息目标，就是消息发送和接受的地点，要么queue，要么topic。
+
+5、创建MessageProducer
+
+6、设置持久化方式
+7、定义消息对象，并发送
+8、释放连接：必须close connection，只有这样ActiveMQ才会释放资源（关闭所有JMS资源，包括connection, session, producer, consumer等）
+
+关于消息的priority/ttl/deliveryMode	
+	消息有优先级及存活时间，在MessageProducer进行send的时候，存在多个重载方
+
+
+http://localhost:8161/admin/ admin:admin
+
+<!-- 配置JMS连接工长 -->
+     <bean id="connectionFactory"
+         class="org.springframework.jms.connection.CachingConnectionFactory">
+         <constructor-arg ref="amqConnectionFactory" />
+         <property name="sessionCacheSize" value="100" />
+     </bean>

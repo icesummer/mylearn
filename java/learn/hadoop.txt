@@ -1,0 +1,75 @@
+Hadoop:
+	分为HDFS与Yarn两个部分
+	HDFS:
+		HDFS有Namenode和Datanode两个部分
+	Yarn是MapReduce2(yarn的两个部分：资源管理、任务调度:Jobtraker与Tasktraker。)
+		Map-Shuffle
+
+自动部署：
+Ambari,Minos,Cloudera Manager
+RPM安装：
+apache Hadoop
+jar包安装：
+各版本一般都有《选》
+1.linux操作系统
+2.安装包
+<准备>：多台linux机器，使用非ROOT安装Hadoop，SSH免密登录
+下载安装包：（开源）各版本可互相升级
+	Apache-Hadoop,原始发行版，其它发行版都基于该发行版（将原始版打包，没有版本问题）
+		https://www.apache.org/dyn/closer.cgi/hadoop/common/hadoop-2.9.2/hadoop-2.9.2.tar.gz
+	HDP：Hortonworks公司发行版开源
+	CDH：Cloudera发行，开源-流行
+		CDH4 基于Apache Hadoop 0.23.0
+		CDH5 基于Apache Hadoop 2.2.0
+		
+	
+3.将Hadoop安装包分发到各个节点的同一目录下
+4.修改配置
+5.启动服务
+6.验证
+夏
+夏艾黎瑷
+
+Hadoop 安装包目录结构
+bin:最基本的管理脚本和使用脚本所在目录(客户端脚本)，是sbin所在目录下管理脚本的基本目录，
+etc:Hadoop配置所在目录，core-site.xml,hdfs-site.xml,..
+include:对外提供的编程库头文件(c++)，用于访问HDFS或编写MapReduce程序
+lib:包含了对外提供的编程动态库和静态库
+libexec:各个服务对应的shell配置文件所在目录，可配置日志输出目录，启动参数等基本信息
+sbin:Hadoop管理脚本所在目录，主要包含HDFS和YARN中各类服务的启动/关闭脚本
+share:Hadoop各个模块编译后的jar包所在目录
+=== Java™ must be installed.
+=== ssh must be installed 
+2.安装jdk
+3.机器参数设置：
+	hostname设置：eg:hostname:hadoop001(vim /etc/sysconfig/network)
+	设置ip和hostname的映射关系：192.168.199.200 (vim /etc/hosts)
+	SSH 免密登录：(集群各个节点之间需要免密码)	:ssh-keygen -t rsa
+		~.ssh/ 里面有id_rsa和id_rsa_pub秘钥对
+		cp ~/.ssh/id_rsa_pub ~/.ssh/authorized_keys
+	测试：ssh hadoop001
+4.配置Hadoop
+	解压hadoop-cdh，进入hadoop/etc/配置文件的/hadoop
+	core-site.xml:
+	vim ..../hadoop/etc/hadoop/hadoop-env.sh>>export JAVA_HOME=/dafd/jdk1.8.xx
+	vim ..../hadoop/etc/hadoop/core-site.xml()
+		修改<property>设置默认文件系统名称（fs.defaultFS=hadf://hadoop001:8020）
+		设置hadoop.tmp.dir(hadoop的系统临时文件) 默认的是系统的临时目录，重启会丢失,so...
+			hadoop.tmp.dir=/app/hadoop/tmp
+	htfs-site.xml:(文件系统的副本系数，默认3),如果是单机就1;dfs.replication=1
+5.格式化hdfs
+6.启动hdfs
+	验证：jps...
+	sbin/start-dfs.sh
+	
+6.启动hdfs sbin/stop-dfs.sh
+		
+		
+		
+		
+		
+	
+	
+
+
+

@@ -1,0 +1,72 @@
+CentOS7 下升级Python版本
+来博客园的第一篇博客，以后要坚持养成记录、分享的习惯啊，这样生活才会有痕迹~
+
+服务器版本：CentOS 7.3 64位
+
+旧Python版本：2.7.5
+
+新Python版本：3.8.0
+
+说明：本次配置使用root用户进行操作，故在代码中未使用sudo语句，请使用非root用户留意
+
+ 1、切换工作目录至/usr/local
+
+在Linux系统下，路径/usr/local相当于C:/Progrem Files/，通常安装软件时便安装到此目录下。
+
+执行命令：
+
+cd /usr/local
+2、下载目标python版本压缩包
+
+执行命令：
+
+wget http://npm.taobao.org/mirrors/python/3.8.0/Python-3.8.0.tgz
+这里，我使用的是python在国内的镜像，若希望使用官网地址当然也是可以的，不过速度就两说了...
+
+3、解压压缩包
+
+执行命令：
+
+tar -xzf Python-3.8.0.tgz
+4、在当前目录下创建文件夹--python3
+
+执行命令：
+
+mkdir python3
+5、编译与安装
+
+执行步骤：
+a.进入解压文件路径
+
+cd Python-3.8.0
+b.生成makefile文件
+
+./configure --prefix=/usr/local/python3
+c. 对makefile文件进行操作
+
+make
+d.安装
+
+make install
+命令解释：
+在Linux中通过源码安装程序时，对于解压文件，先执行./configure，后执行make，最后执行make install
+　　　　make 命令 是对makefile文件操作，make install 是安装命令，那么 ./configure 是干什么呢？./configure 其实就是生成 makefile 文件
+
+——参考“朝闻道”
+
+--prefix作用：编译的时候用来指定程序存放路径。
+　　　　不指定prefix，可执行文件默认放在/usr/local/bin，库文件默认放在/usr/local/lib，配置文件默认放在/usr/local/etc，其它的资源文件放在/usr/local/share
+
+　　　　指定prefix，直接删掉一个文件夹就够了
+
+——参考“百度知道”
+
+问题：
+在这个过程中，出现了安装失败的问题：
+
+zipimport.ZipImportError: can't decompress data; zlib not available
+这是由于缺少依赖造成的，可执行以下代码：
+
+yum install zlib-devel bzip2 bzip2-devel readline-devel sqlite sqlite-devel openssl-devel xz xz-devel libffi-devel
+
+

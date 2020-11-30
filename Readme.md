@@ -11,7 +11,7 @@
 
 * [SpringCloud.xmind](spring-cloud/SpringCloud.xmind)
 * [微服务架构.md](spring-cloud/微服务架构.md)
-* [Readme-dubbo](spring-cloud/Readme-dubbo.md)
+* [Readme-dubbo.md](spring-cloud/Readme-dubbo.md)
 
 
 
@@ -24,6 +24,10 @@
 ## android
 
 * [Android.md](android/Android.md)
-
 * [linux.txt](linux/linux.txt)
+
+## Java
+
+* [Java](java/RAEADME.md)
+* [design-pattern](java/design-pattern.md)
 

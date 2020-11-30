@@ -1,0 +1,2 @@
+
+docker run --name mynginx -v /data/docker/nginx/conf:/etc/nginx/conf.d:ro -v /data/docker/nginx/html:/usr/share/nginx/html:ro -p 80:80 -d daocloud.io/nginx

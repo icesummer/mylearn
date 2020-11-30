@@ -605,47 +605,47 @@ QUEUED
 >   
 >   ```
 
-- jedis操作事务
+jedis操作事务测试
 
-  ```java
-  @Test
-  public void testJedisTransaction(){
-      Jedis jedis = new Jedis(host,port);
-      jedis.auth(auth);
-      jedis.select(1);// 选择数据库
-      jedis.flushDB();// 选择数据库
-      JSONObject json = new JSONObject();
-      json.put("hello","world");
-      json.put("name","zhangsan");
-      // 开启事务
-      Transaction multi = jedis.multi();
-      String user2 = JSONObject.toJSONString(json);
-      // 设置string类型user1和user2
-      multi.set("user1",user2);
-      multi.set("user2",user2);
-  
-      // 添加一个zset集合
-      multi.zadd("zk1",1,"m1");
-      multi.zadd("zk1",2,"m2");
-      multi.zadd("zk1",5,"m5");
-      multi.zadd("zk1",3,"m3");
-      multi.zadd("zk1",6,"m6");
-      try {
-          int m = 1/0;// 发生异常，执行失败
-          multi.exec();
-      } catch (Exception e) {
-          multi.discard();// 失败放弃事务
-          e.printStackTrace();
-      } finally {// 是否又数据
-          System.out.println("user1："+jedis.get("user2"));
-          System.out.println("user2："+jedis.get("user2"));
-          System.out.println("zset:排序："+jedis.zrangeByScoreWithScores("zk1","-inf","+inf"));
-          multi.clear();
-          multi.close();
-      }
-      jedis.close();
-  }
-  ```
+```java
+@Test
+public void testJedisTransaction(){
+    Jedis jedis = new Jedis(host,port);
+    jedis.auth(auth);
+    jedis.select(1);// 选择数据库
+    jedis.flushDB();// 选择数据库
+    JSONObject json = new JSONObject();
+    json.put("hello","world");
+    json.put("name","zhangsan");
+    // 开启事务
+    Transaction multi = jedis.multi();
+    String user2 = JSONObject.toJSONString(json);
+    // 设置string类型user1和user2
+    multi.set("user1",user2);
+    multi.set("user2",user2);
+
+    // 添加一个zset集合
+    multi.zadd("zk1",1,"m1");
+    multi.zadd("zk1",2,"m2");
+    multi.zadd("zk1",5,"m5");
+    multi.zadd("zk1",3,"m3");
+    multi.zadd("zk1",6,"m6");
+    try {
+        int m = 1/0;// 发生异常，执行失败
+        multi.exec();
+    } catch (Exception e) {
+        multi.discard();// 失败放弃事务
+        e.printStackTrace();
+    } finally {// 是否又数据
+        System.out.println("user1："+jedis.get("user2"));
+        System.out.println("user2："+jedis.get("user2"));
+        System.out.println("zset:排序："+jedis.zrangeByScoreWithScores("zk1","-inf","+inf"));
+        multi.clear();
+        multi.close();
+    }
+    jedis.close();
+}
+```
 
 ### 3.2 SpingData+Redis
 
@@ -663,9 +663,9 @@ QUEUED
 > <!--springboot2.x 集成的redis客户端框架Lettuce -->
 > <!--
 > <dependency>
->   <groupId>io.lettuce</groupId>
->   <artifactId>lettuce-core</artifactId>
->   <version>6.0.1.RELEASE</version>
+> <groupId>io.lettuce</groupId>
+> <artifactId>lettuce-core</artifactId>
+> <version>6.0.1.RELEASE</version>
 > </dependency>   
 > -->
 > 
@@ -718,46 +718,44 @@ public StringRedisTemplate stringRedisTemplate(RedisConnectionFactory redisConne
 
 > 整合测试
 
-- 1. 导入依赖
+1. 导入依赖
 
-     ```xml
-     <!--springboot-data2.x 集成的redis客户端框架Lettuce -->
-     <dependency>
-     	<groupId>org.springframework.boot</groupId>
-     	<artifactId>spring-boot-starter-data-redis</artifactId>
-     	<version>2.4.0</version>
-     </dependency>
-     ```
+```xml
+<!--springboot-data2.x 集成的redis客户端框架Lettuce -->
+<dependency>
+<groupId>org.springframework.boot</groupId>
+<artifactId>spring-boot-starter-data-redis</artifactId>
+<version>2.4.0</version>
+</dependency>
+```
 
-     
+2. 配置连接<spring.redis开头>
 
-  2. 配置连接<spring.redis开头>
+```properties
+// 由RedisProperties.class可知 配置是以spring.redis前缀的
+@ConfigurationProperties(prefix = "spring.redis")
+public class RedisProperties {
+    private int database = 0;
+    private String url;
+    //... more 
+}
 
-     ```properties
-     // 由RedisProperties.class可知 配置是以spring.redis前缀的
-     @ConfigurationProperties(prefix = "spring.redis")
-     public class RedisProperties {
-         private int database = 0;
-         private String url;
-         //... more 
-     }
-     
-     ##SpringBoot都有一个自动配置类
-     ### 自动配置类都会绑定一个properties配置文件
-     ### redis的自动配置类在2.4.0/spring-boot-autoconfigure-2.4.0.jar!/META-INF/spring.factories找!/RedisAutoConfiguration.class
-     ### RedisAutoConfiguration找到@EnableConfigurationProperties({RedisProperties.class})
-     ### 打开RedisProperties.class既是redis的配置文件类
-     spring.redis.host=ctos.javazz.com
-     spring.redis.password=123!@#
-     #spring.redis.port=6379 # 默认配置不用写
-     #spring.redis.database=0 # 默认配置不用写
-     # 连接池配置,尽量使用lettuce的配置，Jedis也兼容
-     #spring.redis.lettuce.pool.max-active=8 # 默认配置不用写
-     #spring.redis.lettuce.pool.max-wait=-1ms
-     #spring.redis.lettuce.pool.max-idle=8
-     #spring.redis.lettuce.pool.min-idle=0
-     ```
-     
+##SpringBoot都有一个自动配置类
+### 自动配置类都会绑定一个properties配置文件
+### redis的自动配置类在2.4.0/spring-boot-autoconfigure-2.4.0.jar!/META-INF/spring.factories找!/RedisAutoConfiguration.class
+### RedisAutoConfiguration找到@EnableConfigurationProperties({RedisProperties.class})
+### 打开RedisProperties.class既是redis的配置文件类
+spring.redis.host=ctos.javazz.com
+spring.redis.password=123!@#
+#spring.redis.port=6379 # 默认配置不用写
+#spring.redis.database=0 # 默认配置不用写
+# 连接池配置,尽量使用lettuce的配置，Jedis也兼容
+#spring.redis.lettuce.pool.max-active=8 # 默认配置不用写
+#spring.redis.lettuce.pool.max-wait=-1ms
+#spring.redis.lettuce.pool.max-idle=8
+#spring.redis.lettuce.pool.min-idle=0
+```
+
 3. 测试
   
    ```java
@@ -855,6 +853,54 @@ public StringRedisTemplate stringRedisTemplate(RedisConnectionFactory redisConne
 > ```
 >
 > - 以上操作api比较繁琐，可以手写优化相关写法
+
+#### 3.2.1 redis session共享
+
+* pring Session提供了集群Session（Clustered Sessions）功能，默认采用外置的Redis来存储Session数据，以此来解决Session共享的问题
+
+> 导入依赖
+
+```xml
+<dependency>
+    Spring Session（实现 Session 共享）
+    <groupId>org.springframework.session</groupId>
+    <artifactId>spring-session-data-redis</artifactId>
+    <version>${redis.spring-boot-starter.version}</version>
+</dependency>
+```
+
+
+
+> 代码
+
+```java
+@Autowired
+private RedisTemplate redisTemplate;
+@GetMapping("/rediSet")
+public String redis(HttpSession session){
+    // redisTemplate.opsForValue().set("ra","ok???");
+    // String s = redisTemplate.opsForValue().get("ra").toString();
+    String s= "login";
+    session.setAttribute("login",s);
+    return s;
+}
+@GetMapping("/redisGet")
+public String redis2(HttpSession session){
+    //redisTemplate.opsForValue().set("ra","ok???");
+    //String s = redisTemplate.opsForValue().get("ra").toString();
+    String login = session.getAttribute("login")+"";
+    return login+"----"+s;
+}
+```
+
+> 启动两个服务8080；8081测试(跨域session无效)
+
+```bash
+http://192.168.1.100:8080/redisSet # 插入session数据
+http://192.168.1.100:8081/redisGet # 获取session数据
+```
+
+
 
 #### Redis工具类
 

@@ -1,0 +1,35 @@
+https://vuejs.org/js/vue.min.js
+https://cdn.staticfile.org/vue/2.4.2/vue.min.js
+https://unpkg.com/vue/dist/vue.js
+HTML 属性中的值应使用 v-bind 指令。
+v-model:数据双向绑定
+v-for:数据循环
+v-prevent:(v-on:submit.prevent="todo(map)"form执行提交前事件)
+v-on:(绑定事件v-on:click)
+
+computed:{定义数据处理的声明函数}
+v-bind:class:绑定class
+
+组件化：
+<script type="text/x-template" id="id">...</script>
+Vue.component("map-form",{
+	template:"#id",
+})
+工具
+
+// 注册一个全局自定义指令 v-focus
+Vue.directive('focus', {
+  // 当绑定元素插入到 DOM 中。
+  inserted: function (el) {
+    // 聚焦元素
+    el.focus();
+  }
+})
+
+npm是什么东东？npm其实是Node.js的包管理工具
+
+10 1 109
+
+厨房墙纸，垃圾桶，晾衣架，衣撑，地拖
+
+

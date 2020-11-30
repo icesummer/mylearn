@@ -926,7 +926,12 @@ docker-compose up -d && docker-compose logs -f
 八、其它
 
 > - <a href="http://hemiao3000.gitee.io/java-note-for-free/" target="_blank">别人的笔记</a>
+> - <a href="https://www.bilibili.com/video/BV1et411T7Rt?p=102" target="_blank">K8s</a>
 
-END
+
+
+
+
+## END
 
 ***
