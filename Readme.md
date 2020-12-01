@@ -1,5 +1,13 @@
 # 												Roadmap
 
+## Java
+
+* [Java](java/RAEADME.md)
+* [ava多线程]
+* [design-pattern](java/design-pattern.md)
+
+
+
 ## spring
 
 * [Spring学习路线](spring/learning-helper.md)
@@ -21,13 +29,13 @@
 * [docker-compose-redis.md](docker/mynexus/docker-compose-Nexus)
 * [k8s.md](docker/k8s/Readme.md)
 
+DB
+
 ## android
 
 * [Android.md](android/Android.md)
 * [linux.txt](linux/linux.txt)
 
-## Java
+Vue
 
-* [Java](java/RAEADME.md)
-* [design-pattern](java/design-pattern.md)
-
+* [Vue](vue/vue-learning.md)

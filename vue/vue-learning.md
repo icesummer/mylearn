@@ -131,8 +131,8 @@ var app = new Vue({
 > v-html要防止XSS,CSRF攻击（
 >
 >    			1. 前端过滤
->       			2. 后台转义(`< 和 >转义为--> &lt; 和 &gt;`)
->          			3. 给cookie加属性http
+>             			2. 后台转义(`< 和 >转义为--> &lt; 和 &gt;`)
+>                   			3. 给cookie加属性http
 >
 > * 
 
@@ -205,9 +205,9 @@ data:{idHas:true}
 
 
 
-### v-on:click=绑定click事件-略写 (@click=)：
+### v-on:click=绑定事件(@click:)
 
-```@click=""-----等于----v-on:click=""```
+```@click=""-----略写----v-on:click=""```
 
 ```vue
 <span v-bind:title="message" class="span-text-1">
@@ -446,12 +446,6 @@ computed: {
 
 
 
-## Axios通信
-
-Axios是一个开源的可以用在浏览器端和NodeJs的异步通信框架，实现Ajax的异步通信功能
-
-官网 `https://github.com/axios/axios`
-
 
 
 ### 内容分发与自定义组件
@@ -460,7 +454,13 @@ Axios是一个开源的可以用在浏览器端和NodeJs的异步通信框架，
 
   **this.$emit('myEvent')**
 
-  
+## Axios通信
+
+Axios是一个开源的可以用在浏览器端和NodeJs的异步通信框架，实现Ajax的异步通信功能
+
+官网 `https://github.com/axios/axios`
+
+
 
 ## vue-cli
 

@@ -47,3 +47,43 @@ Git&GitHub:![img](https://i0.hdslb.com/bfs/activity-plat/static/20201110/4c8b2db
 尚硅谷教程and资料（全部免费，无需转发集赞）:![img](https://i0.hdslb.com/bfs/activity-plat/static/20201110/4c8b2dbaded282e67c9a31daa4297c3c/6BO9VeUCy.png)[尚硅谷教程如何下载（以下载java基础为例）](https://www.bilibili.com/read/cv3860455)
 
 教程学习中可能遇到的非技术问题（只有声音、pdf无法复制、提取码等错误）:![img](https://i0.hdslb.com/bfs/activity-plat/static/20201110/4c8b2dbaded282e67c9a31daa4297c3c/6BO9VeUCy.png)[学习尚硅谷教程遇到的各种常识性问题](https://www.bilibili.com/read/cv3829288)
+
+
+
+步骤：
+
+1. Java多线程高级编程
+https://www.bilibili.com/video/BV1m4411u7xK?p=7
+
+3. Spring补强
+https://www.bilibili.com/video/BV1Vf4y127N5?p=15
+
+3. SpringBoot补强
+     AOP，Transaction，Log，Schedule，Security|shiro + oauth2，Mq
+
+4. SpringCloud补强(50%)
+4.1 Zookeeper，Dubbo，Gateway
+4.2 分布式架构
+5. Netty
+https://www.bilibili.com/video/BV1DJ411m7NR
+6. Redis(80%)
+7. Docker(70%)
+
+---
+
+1. Vue (40%)
+   https://www.bilibili.com/video/BV1et411T7Rt?p=82
+2. DB优化
+3. JVM
+4. 设计模式()
+5. devOps(k8s+jenkins)
+
+---
+
+1. Python()
+2. Android()
+3. Css3()
+
+分布式架构，微服务架构，源码分析，并发，性能优化，数据结构预算法，高并发实战经验，工程
+
+集群，微服务，网格服务，Serverless，
