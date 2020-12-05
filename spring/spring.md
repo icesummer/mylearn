@@ -1520,8 +1520,6 @@ C:\bing\Java\jdk1.8.0_172\bin\java.exe
 >
 > * 错误信号和完成信号不能共存；
 
-
-
 ```xml
  <!--reactor依赖-->
 <dependency>
