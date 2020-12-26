@@ -131,8 +131,8 @@ var app = new Vue({
 > v-html要防止XSS,CSRF攻击（
 >
 >    			1. 前端过滤
->             			2. 后台转义(`< 和 >转义为--> &lt; 和 &gt;`)
->                   			3. 给cookie加属性http
+>    	        			2. 后台转义(`< 和 >转义为--> &lt; 和 &gt;`)
+>    	              			3. 给cookie加属性http
 >
 > * 
 
@@ -485,7 +485,7 @@ https://www.cnblogs.com/luckybaby519/p/13904457.html
 
 
 
-VSCode
+## VSCode
 
 ```sh
 https://code.visualstudio.com/ # 官网

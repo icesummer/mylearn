@@ -409,7 +409,7 @@ public void testCharset() throws IOException {
 }
 ```
 
-# NIO网络通信
+# **NIO网络通信**
 
 ## NIO的阻塞与非阻塞
 
@@ -423,21 +423,25 @@ public void testCharset() throws IOException {
 >
 > 2. 缓冲区（buffer）：负责数据存取
 >
-> 3. 选择器（Selector）：是SelectableChannel的多路复用器，用于监控SelectableChannel的IO状况
+> 3. 选择器（Selector）：
 >
+>    Selector是SelectableChannel的多路复用器，用于监控SelectableChannel的IO状况；
+>
+>    **可实现应用程序通过一个阻塞对象监听多路连接请求**；
+>    
 >    3.1 相关实现类：
->
+>    
 >    ```java
 >    java.nio.channels.Channel 接口:
->    			|-- SelectableChannel
+>              |-- SelectableChannel
 >                    |-- SocketChannel
 >                    |-- ServerSocketChannel
->                    |-- DatagramChannel
->                    |-- Pip.SinkChannel     // 单向存管道channel
->                    |-- Pip.SourceChannel // 单向取管道channel
+> 	                |-- DatagramChannel
+>                 |-- Pip.SinkChannel     // 单向存管道channel
+>                    |-- Pip.SourceChannel   // 单向取管道channel
 >    ```
-> 	 3.2 选择器监听的Channel的事件类型：
->
+>     3.2 选择器监听的Channel的事件类型：
+>    
 >    > 每次向选择器注册通道时，就指定一个监听事件
 >    
 >    * 读：SelectionKey.OP_READ（1）
@@ -450,6 +454,10 @@ public void testCharset() throws IOException {
 >    ```java
 >    int interestSet = SelectionKey.OP_READ|SelectionKey.OP_WRITE
 >    ```
+>    
+>     流行的Reactor框架：[@Netty](JavaNetty.md)
+>    
+>     **Reactor对象通过Select监控客户端请求事件，收到事件后通过Dispatch进行分发；如果是建立连接请求事件，则由Reactor通过Accept处理连接请求，然后建立一个Handler对象处理连接完成后的后续业务；如果不是连接事件，则Ractor会分发调用连接对应的Handler响应；Handler会完成Read->完成业务->Send的完整业务流程；**
 
 
 
@@ -681,22 +689,240 @@ public void testPip() throws IOException {
 
 
 
-# Java8新特性
+## 群聊代码
 
-> 1. **Lambda表达式**
-> 2. 函数式接口
-> 3. 方法引用和构造器引用
-> 4. **Stream Api**
-> 5. 接口的默认方法和静态方法
-> 6. 新时间日期API
-> 7. 其它
+> GroupChatServer
+
+```java
+/**NIO群聊服务端*/
+public class GroupChatServer {
+    ServerSocketChannel ssChannel;
+    Selector selector = null;
+    private static Integer PORT = 9999;
+    /**
+     *  初始化服务端
+     */
+    public GroupChatServer(){
+        try {
+            // 获取服务端通道
+            ssChannel = ServerSocketChannel.open();
+            ssChannel.configureBlocking(false);// 设置非阻塞模式
+            ssChannel.bind(new InetSocketAddress(PORT));
+            // 获取选择器
+            selector = Selector.open();
+            // 将监听通道注册进选择器
+            ssChannel.register(selector, SelectionKey.OP_ACCEPT);
+            System.out.println("服务端准备就绪 - > > > ");
+            listen();
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.out.println("服务端启动失败");
+        }
+    }
+    /**监听客户端信息*/
+    public void listen(){
+        try {
+            while (true){
+                int channels = selector.select(2000);
+                if(channels>0){ // 有就绪事件
+                    Iterator<SelectionKey> iterator = selector.selectedKeys().iterator();
+                    while (iterator.hasNext()){
+                        SelectionKey key = iterator.next();
+                        // if监听到accept
+                        if (key.isAcceptable()) {
+                            SocketChannel channel = ssChannel.accept();// 获取连接的chennel
+                            channel.configureBlocking(false);
+                            // 将channel注册进selector
+                            channel.register(selector,SelectionKey.OP_READ);
+                            // 消息提醒：
+                            System.out.println(channel.getRemoteAddress()+" 上线了 - > > > ");
+                        }
+                        if (key.isReadable()){
+                            readData(key);
+                        }
+                        // 移除当前key，防止重复操作
+                        iterator.remove();
+                    }
+                }
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+
+        }
+    }
+
+    /**解析客户端信息并调用消息分发*/
+    private void readData(SelectionKey key)  {
+        ByteBuffer dst = null;
+        SocketChannel channel = null;
+
+        try {
+            channel = (SocketChannel)key.channel();
+            dst = ByteBuffer.allocate(1024);
+            int read = channel.read(dst);
+            dst.flip();
+            String msg = new String(dst.array(),0,dst.limit()).trim();
+            System.out.println("from client : "+ msg);
+            // 想其它客户端转发消息
+            distributeMsg(channel,msg);
+        } catch (IOException e) {
+            try {
+                System.out.println(channel.getRemoteAddress().toString()+"下线了..."+ LocalDateTime.now().toLocalTime());
+                key.cancel();// 取消注册
+                channel.close();// 关闭通道
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
+        dst.clear();
+    }
+
+    /** 将消息分发给其它客户端*/
+    private void distributeMsg(SocketChannel currChannel, String msg) throws IOException {
+        System.out.println("服务器转发消息中...");
+        // 遍历所有注册到selector的socketChannel，并排除当前channnel
+        Iterator<SelectionKey> iterator = selector.keys().iterator();
+        while (iterator.hasNext()) {
+            //SelectionKey key = iterator.next();
+            Channel channel = iterator.next().channel();
+            if(channel instanceof SocketChannel && channel!=currChannel){// 排除消息发送者
+                SocketChannel targetChannel = (SocketChannel)channel;
+                ByteBuffer buf = ByteBuffer.wrap(msg.getBytes());
+                // 写入客户端通道
+                targetChannel.write(buf);
+            }
+        }
+        //iterator.remove(); // 不需要删
+    }
+    
+    public static void main(String[] args) {
+        GroupChatServer chatServer = new GroupChatServer();
+        chatServer.listen();
+    }
+}
+```
+
+> GroupChatClient
+
+```java
+/**NIO群聊客户端*/
+public class GroupChatClient {
+    private static Integer SERVER_PORT= 9999;
+    private static String SERVER_HOST= "127.0.0.1";
+    SocketChannel clentChannel= null;
+    Selector selector = null;
+    private String username;
+    /** 初始化客户端*/
+    public GroupChatClient(){
+        try {
+            // 获取一个同奥
+            clentChannel = SocketChannel.open(new InetSocketAddress(SERVER_HOST,SERVER_PORT));
+            // 非阻塞模式
+            clentChannel.configureBlocking(false);
+            // 获取选择器
+            selector = Selector.open();
+            // 将通道注册进选择器，用于接收消息
+            clentChannel.register(selector, SelectionKey.OP_READ);
+            username = clentChannel.getLocalAddress().toString().substring(1);
+            System.out.println(username+" 上线成功 > > ");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    /** 发送消息*/
+    public void sendInfo(String info){
+        info = username+" > 说："+info;
+        try {
+            ByteBuffer buffer = ByteBuffer.wrap(info.trim().getBytes());
+            clentChannel.write(buffer);
+            buffer.clear();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    /** 接收群消息*/
+    public void receiveInfo(){
+        try {
+            if (selector.select(/*2000*/)>0) {// 有可用的通道
+                Iterator<SelectionKey> iterator = selector.selectedKeys().iterator();
+                while (iterator.hasNext()) {
+                    SelectionKey key = iterator.next();
+                    if (key.isReadable()){
+                        SocketChannel channel = (SocketChannel)key.channel();
+                        ByteBuffer dst = ByteBuffer.allocate(1024);
+                        channel.read(dst);
+                        String info = new String(dst.array());
+                        System.out.println("> > "+info.trim());
+                    }
+                    iterator.remove();// 要移除当前selectkey
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void main(String[] args) {
+        GroupChatClient chatClient = new GroupChatClient();
+        // 实时读取群消息
+        new Thread(() -> {
+            while (true){
+                chatClient.receiveInfo();
+                try {
+                    Thread.currentThread().sleep(3000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+        // 发送消息给群聊服务器
+        Scanner scanner = new Scanner(System.in);
+        while (scanner.hasNextLine()){
+            String msg = scanner.nextLine();
+            if(msg!=null&&msg.trim().length()>0){
+                chatClient.sendInfo(" " +msg.trim());
+            }
+
+        }
+    }
+}
+```
 
 
 
+## NIO与零拷贝
+
+> 零拷贝是性能优化的关键，特指操作系统中不经过CPU的拷贝
+>
+> Java中常用的零拷贝：有1.mmap(内存映射)，2. sendFile
+
+> 传统IO的网络传输：需要经过4次拷贝，3次切换（4次拷贝，3次切换）
+>
+> mmap的优化：mmap通过内存映射，将文件映射到内核缓冲区，同时，用户空间可以共享内核空间的数据；这样在网络传输中，就可以减少内核空间到用户空间的拷贝次数，比传统的i/o减少了1次拷贝（3次拷贝，3次切换）；
+>
+> sendfile优化：
+>
+> ​	linux2.1中支持；基本原理是数据根本不经过用户态，直接从内核缓冲区进入到SocketBuffer，由于和用户态完全无关就又减少了一次上下文切换（3次拷贝，2次切换）不是真正的零拷贝
+>
+> ​	linux2.4+中优化，避免了从内核缓冲区拷贝到SocketBuffer的操作，（真正的零拷贝）（2此拷贝，2次切换）
+>
+> ​	；
 
 
 
+# Netty
+
+> 异步的基于事件驱动的网络应用框架
+>
+> 官网：(https://netty.io)
+
+
+
+# 
 
 ---
 
 # end
+

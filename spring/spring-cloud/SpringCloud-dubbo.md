@@ -15,13 +15,13 @@
 > - dubbo.protocol.port=20880 
 > - dubbo.scan.base-packages=com.?.service.impl
 > - dubbo.config-center.address.nacos=//${nacos.server-address}:${nacos.port}
- 
+
 > 3.dubbo-consumer.properties
  > - dubbo.application.name=nacos-registry-demo-consumer
  > - dubbo.registry.address=nacos://${nacos.address:localhost}:8848
  > - dubbo.consumer.timeout=3000
  > - dubbo.config-center.address.nacos=//${nacos.server-address}:${nacos.port}
- 
+
 >>> [推荐用法](http://dubbo.apache.org/zh-cn/docs/2.7/user/recommend/)
 
 > - [dubbo官网](http://dubbo.apache.org/zh-cn/docs/2.7/user/configuration/annotation/)
@@ -55,10 +55,11 @@ UDP:        无连接
 > json序列化   -- 
 > java序列化
 ```
-- 推荐使用两个：Kryo和THrift
---- 
+- 推荐使用两个：Kryo和Thrift
+---
 ### dubbo序列化之Kryo和Thrift
 > dubbo 序列化之Kryo（java）和Thrift（跨语言）
+>
 > > 打法
 
 #### kryo

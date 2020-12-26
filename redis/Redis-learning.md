@@ -786,14 +786,14 @@ spring.redis.password=123!@#
      }
    ```
 
-> 对象序列化
->
+### 3.3 对象序列化
+
 > - 默认的序列化为RedisTemplate<Object, Object> 和StringRedisTemplate 
->   //实际开发需要配置为RedisTemplate<String, Object>
+>  //实际开发需要配置为RedisTemplate<String, Object>
 > - 配置具体的序列化方式：
->
-> ```java
 > 
+> ```java
+>
 > @Configuration
 > public class RedisConfig {
 >     // 默认的配置是在类RedisAutoConfiguration的RedisTemplate<Object, Object>
@@ -851,10 +851,99 @@ spring.redis.password=123!@#
 >     System.out.println(redisTemplate.opsForList().range("users",0,-1));
 > }
 > ```
->
+> 
 > - 以上操作api比较繁琐，可以手写优化相关写法
 
-#### 3.2.1 redis session共享
+### 3.4 带前缀的key序列化
+
+> 更好的管理key对开发和后期维护非常重要
+
+1. 给key加上标识前缀（一般以项目编号+模块编号为前缀）
+
+> 对Key字符串序列化新增前缀（RedisTemplate模板 --带前缀的Key序列化器）
+
+```properties
+spring.redis.prefix.key=jz201:redison
+spring.redis.prefix.enable=true
+```
+
+```java
+// redis的项目key前缀配置类
+@Component
+@ConfigurationProperties(prefix = "spring.redis.prefix")
+public class RedisKeyPrefixProperties {
+    private Boolean enable = Boolean.TRUE;
+    private String key;
+    public Boolean getEnable() {
+        return enable;
+    }
+    public void setEnable(Boolean enable) {
+        this.enable = enable;
+    }
+    public String getKey() {
+        return key;
+    }
+    public void setKey(String key) {
+        this.key = key;
+    }
+}
+```
+
+> Redis带前缀的Key序列化器
+
+```java
+/**
+ * RedisTemplate模板 --带前缀的序列化器
+ */
+public class PrefixStringKeySerializer extends StringRedisSerializer {
+    private Charset charset = StandardCharsets.UTF_8;
+    private RedisKeyPrefixProperties prefix;
+
+    public PrefixStringKeySerializer(RedisKeyPrefixProperties prefix) {
+        super();
+        this.prefix = prefix;
+    }
+
+    @Override
+    public String deserialize(@Nullable byte[] bytes) {
+        String saveKey = new String(bytes, charset);
+        if (prefix.getEnable() != null && prefix.getEnable()) {
+            String prefixKey = spliceKey(prefix.getKey());
+            int indexOf = saveKey.indexOf(prefixKey);
+            if (indexOf > 0) {
+                saveKey = saveKey.substring(indexOf);
+            }
+        }
+        return (saveKey.getBytes() == null ? null : saveKey);
+    }
+
+    @Override
+    public byte[] serialize(@Nullable String key) {
+        if (prefix.getEnable() != null && prefix.getEnable()) {
+            key = spliceKey(prefix.getKey()) + key;
+        }
+        return (key == null ? null : key.getBytes(charset));
+    }
+
+    private String spliceKey(String prefixKey) {
+        if (!StringUtils.isEmpty(prefixKey) && !prefixKey.endsWith(":")) {
+            prefixKey = prefixKey + "::";
+        }
+        return prefixKey;
+    }
+}
+```
+
+> 自定义的RedisConfig类设置带前缀的Key序列化器
+
+```java
+// 3. key使用String的序列化器
+StringRedisSerializer stringRedisSerializer = new PrefixStringKeySerializer(redisKeyPrefixProperties);
+```
+
+
+
+### 3.5 redis session共享
 
 * pring Session提供了集群Session（Clustered Sessions）功能，默认采用外置的Redis来存储Session数据，以此来解决Session共享的问题
 
@@ -907,9 +996,6 @@ http://192.168.1.100:8081/redisGet # 获取session数据
 ```java
 
 ```
-
-
-
 
 ---
 

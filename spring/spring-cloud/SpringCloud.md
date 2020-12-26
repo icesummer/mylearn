@@ -192,7 +192,7 @@ spring:
 
 ### Nacos+Dubbo集成
 
-* 参考[Readme-dubbo.md](Readme-dubbo.md)
+* 参考[SpringCloud-dubbo.md](SpringCloud-dubbo.md)
 
 
 

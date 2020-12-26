@@ -8,6 +8,7 @@
 ## 一、基本命令
 
 * win安装docker和docker-compose [教程][https://blog.csdn.net/xiayu204575/article/details/100187557]
+* systemctl start docker 启动docker服务
 
 ### 1）帮助命令
 
@@ -95,9 +96,9 @@ docker ps [OPTIONS]
 #### 1.3.3 退出和进入运行中容器
 
 	1.3.3.1 交互启动模式下--两种：
-
- 	1. `exit`  容器内执行，容器停止并退出
- 	2. 快捷键：`ctrl+P+Q  ` 容器不停止退出
+	
+	1. `exit`  容器内执行，容器停止并退出
+	2. 快捷键：`ctrl+P+Q  ` 容器不停止退出
 
 #### 1.3.4  停止容器
 
